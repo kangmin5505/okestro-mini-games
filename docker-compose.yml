@@ -1,0 +1,61 @@
+version: "3"
+
+services:
+  frontend:
+    restart: always
+    container_name: frontend
+    image: nginx:latest
+    depends_on:
+      - backend
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/html:/usr/share/nginx/html
+      - ./docker/nginx/images:/usr/share/nginx/images
+    ports:
+      - "80:80"
+    networks:
+      - front-tier
+    environment:
+      TZ: ${TIME_ZONE}
+
+  backend:
+    restart: always
+    container_name: backend
+    image: my-tomcat
+    build: .
+    depends_on:
+      - database
+    networks:
+      - front-tier
+      - back-tier
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://database:${MARIADB_PORT}/${MARIADB_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MARIADB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD}
+      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
+      FE_HTTP_URL: ${FE_HTTP_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      TZ: ${TIME_ZONE}
+
+
+  database:
+    restart: always
+    container_name: database
+    image: mariadb:latest
+    volumes:
+      - ./docker/mariadb/data:/var/lib/mysql
+    networks:
+      - back-tier
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      TZ: ${TIME_ZONE}
+
+networks:
+  front-tier:
+    name: front-tier
+  back-tier:
+    name: back-tier

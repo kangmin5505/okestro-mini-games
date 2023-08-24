@@ -1,0 +1,40 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:tcp://localhost/~/test
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 174995034455-sucbbvuumogg53qfkb4u00sp0ciacjoi.apps.googleusercontent.com
+            clientSecret: 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
+            scope:
+              - email
+#logging.level:
+#  org.hibernate.type: trace
+
+app:
+  fe:
+    http-url: "http://localhost:3000"
+  jwt:
+    secret: AIeZ6sEwZU7ijGoKMd/HfKFfPL59ASoX0w6llEGlH8M=
+
+logging:
+  level:
+    web: debug
