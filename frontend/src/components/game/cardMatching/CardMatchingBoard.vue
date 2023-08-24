@@ -20,6 +20,7 @@
           :matchedBy="card.matchedBy"
           :isTurn="isTurn"
           @select-card="flipCard"
+          :class="isTurn ? 'cursor' : ''"
         />
       </TransitionGroup>
     </v-container>
@@ -239,6 +240,10 @@ watch(
   grid-template-rows: repeat(6, 1fr);
   grid-gap: 2%;
   align-self: center;
+}
+
+.cursor {
+  cursor: pointer;
 }
 
 .v-enter-from {
