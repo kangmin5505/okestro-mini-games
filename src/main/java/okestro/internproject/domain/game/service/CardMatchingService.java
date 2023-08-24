@@ -40,10 +40,14 @@ public class CardMatchingService extends GameStompService {
 
 
     @Autowired
-    public CardMatchingService(CardMatchingRepository cardMatchingRepository, OnlineUserService onlineUserService,
-                               SimpMessagingTemplate simpMessagingTemplate, ObjectMapper objectMapper,
-                               UserGameRecordService userGameStatService, GameService gameService,
-                               UserService userService, UserGameStatService userGameRecordService) {
+    public CardMatchingService(CardMatchingRepository cardMatchingRepository,
+                               OnlineUserService onlineUserService,
+                               SimpMessagingTemplate simpMessagingTemplate,
+                               ObjectMapper objectMapper,
+                               UserGameRecordService userGameStatService,
+                               GameService gameService,
+                               UserService userService,
+                               UserGameStatService userGameRecordService) {
         super(cardMatchingRepository, onlineUserService, simpMessagingTemplate, objectMapper);
         this.cardMatchingRepository = cardMatchingRepository;
         this.onlineUserService = onlineUserService;
@@ -57,21 +61,20 @@ public class CardMatchingService extends GameStompService {
 
     @Override
     public void startGame(UUID gameRoomId) {
-        cardMatchingRepository.findById(gameRoomId)
-                .ifPresent(gameRoom -> {
+        GameRoom gameRoom = cardMatchingRepository.findById(gameRoomId)
+                .orElseThrow(() -> new GameException(GameErrorCode.NOT_EXIST_GAME_ROOM));
 
-                    gameRoom.startGame(GameTitle.CARD_MATCHING);
-                    CardMatchingInstance gameInstance = (CardMatchingInstance) gameRoom.getGameInstance();
-                    List<CardItem> cards = gameInstance.getCards();
-                    CardsDto cardsDto = CardsDto.createCardsDto(cards);
+        gameRoom.startGame(GameTitle.CARD_MATCHING);
+        CardMatchingInstance gameInstance = (CardMatchingInstance) gameRoom.getGameInstance();
+        List<CardItem> cards = gameInstance.getCards();
+        CardsDto cardsDto = CardsDto.createCardsDto(cards);
 
-                    Object cardsMessage = objectMapper.createObjectNode()
-                            .put("type", "INIT_BOARD")
-                            .set("content", objectMapper.valueToTree(cardsDto));
-                    simpMessagingTemplate.convertAndSend(String.format("/topic/card-matching/%s", gameRoomId), cardsMessage);
+        Object cardsMessage = objectMapper.createObjectNode()
+                .put("type", "INIT_BOARD")
+                .set("content", objectMapper.valueToTree(cardsDto));
+        simpMessagingTemplate.convertAndSend(String.format("/topic/card-matching/%s", gameRoomId), cardsMessage);
 
-                    changeTurn(gameInstance, gameRoomId, false);
-                });
+        changeTurn(gameInstance, gameRoomId, false);
     }
 
     @Override

@@ -33,7 +33,6 @@ public abstract class GameStompService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ObjectMapper objectMapper;
 
-
     public abstract void startGame(UUID gameRoomId);
 
     public abstract void finishGame(GameRoom gameRoom, UUID gameRoomId);
@@ -107,7 +106,7 @@ public abstract class GameStompService {
         return stompRepository.findById(gameRoomId);
     }
 
-    public void deleteGameRoom(UUID gameRoomId, SimpleUser user) {
+    public void deleteGameRoom(GameTitle gameTitle, UUID gameRoomId, SimpleUser user) {
         GameRoom gameRoom = stompRepository.findById(gameRoomId)
                 .orElseThrow(() -> new GameException(GameErrorCode.NOT_EXIST_GAME_ROOM));
 
@@ -118,8 +117,6 @@ public abstract class GameStompService {
 
         UUID hostId = gameRoom.getGameRoomInfo().getHostId();
         UUID userId = user.getId();
-        // TODO: 오목으로 변경시 수정
-        String gameTitle = GameTitle.CARD_MATCHING.getTitle();
 
         if (hostId.equals(userId)) {
             JsonNode destroyJson = objectMapper.createObjectNode()
@@ -131,13 +128,13 @@ public abstract class GameStompService {
                 onlineUserService.exitGameRoom(onlineUser.getUser().getId());
             }
 
-            simpMessagingTemplate.convertAndSend(String.format("/topic/room-maintain/%s/%s", gameTitle, gameRoomId), destroyJson);
+            simpMessagingTemplate.convertAndSend(String.format("/topic/room-maintain/%s/%s", gameTitle.getTitle(), gameRoomId), destroyJson);
             stompRepository.deleteById(gameRoomId);
         } else {
             gameRoom.getGameRoomInfo().exitUser();
 
-            sendLeaveMaintainMessage(gameTitle, gameRoomId, user);
-            sendLeaveRoomMessage(gameTitle, gameRoomId, user);
+            sendLeaveMaintainMessage(gameTitle.getTitle(), gameRoomId, user);
+            sendLeaveRoomMessage(gameTitle.getTitle(), gameRoomId, user);
         }
 
 
