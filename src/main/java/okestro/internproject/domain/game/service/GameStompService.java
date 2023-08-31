@@ -162,23 +162,19 @@ public abstract class GameStompService {
     }
 
     public boolean isCanStartGame(UUID gameRoomId, SimpleUser user) {
-        Optional<GameRoom> gameRoomOptional = stompRepository.findById(gameRoomId);
+        GameRoom gameRoom = stompRepository.findById(gameRoomId)
+                .orElseThrow(() -> new GameException(GameErrorCode.NOT_EXIST_GAME_ROOM));
 
-        if (gameRoomOptional.isPresent()) {
-            GameRoom gameRoom = gameRoomOptional.get();
-            GameRoomInfo gameRoomInfo = gameRoom.getGameRoomInfo();
-            if (!gameRoomInfo.isHost(user))
-                throw new GameException(GameErrorCode.NOT_GAME_HOST);
-            if (!gameRoomInfo.isEnoughPlayers())
-                throw new GameException(GameErrorCode.NOT_ENOUGH_PLAYERS);
-            if (!gameRoomInfo.isReadyAllPlayers())
-                throw new GameException(GameErrorCode.NOT_READY_ALL_PLAYERS);
-            if (gameRoomInfo.isOnGame())
-                throw new GameException(GameErrorCode.ALREADY_START_GAME);
-
-            return true;
-        }
-        throw new GameException(GameErrorCode.NOT_EXIST_GAME_ROOM);
+        GameRoomInfo gameRoomInfo = gameRoom.getGameRoomInfo();
+        if (!gameRoomInfo.isHost(user))
+            throw new GameException(GameErrorCode.NOT_GAME_HOST);
+        if (!gameRoomInfo.isEnoughPlayers())
+            throw new GameException(GameErrorCode.NOT_ENOUGH_PLAYERS);
+        if (!gameRoomInfo.isReadyAllPlayers())
+            throw new GameException(GameErrorCode.NOT_READY_ALL_PLAYERS);
+        if (gameRoomInfo.isOnGame())
+            throw new GameException(GameErrorCode.ALREADY_START_GAME);
+        return true;
     }
 
 }

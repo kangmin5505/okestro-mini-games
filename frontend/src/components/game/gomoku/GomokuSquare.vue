@@ -12,27 +12,29 @@
       class="stone"
       :class="[stoneColor]"
     />
-    <div
-      v-else-if="state === BoardState.Empty && hoverRef"
-      class="stone"
-      :style="isHover"
-    />
+    <div v-else-if="checkHover" class="stone" :style="hoverStyle" />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, toRefs } from "vue";
-import { BoardState } from "@/types/gomoku";
+import { BoardState, CurrTurn } from "@/types/gomoku";
+import { useUserStore } from "@/store/user";
 
 const props = defineProps<{
   row: number;
   col: number;
   COLUMNS: number;
   state: BoardState;
-  turn: BoardState;
+  turn: CurrTurn | null;
+  userStoneColor: {
+    blackUserId: string;
+    whiteUserId: string;
+  } | null;
 }>();
-const { row, col, COLUMNS, state, turn } = toRefs(props);
+const { row, col, COLUMNS, state, turn, userStoneColor } = toRefs(props);
 const hoverRef = ref(false);
+const { user } = useUserStore();
 
 const isDot = computed(() => {
   return (
@@ -66,14 +68,24 @@ const stoneColor = computed(() => {
   return state.value === BoardState.Black ? "bg-black" : "bg-white";
 });
 
-const isHover = computed(() => {
-  if (hoverRef.value) {
-    if (turn.value === BoardState.Black) {
+const hoverStyle = computed(() => {
+  if (!turn.value) return;
+
+  if (turn.value.id === user?.id && hoverRef.value) {
+    if (turn.value.id === userStoneColor.value.blackUserId) {
       return "background-color:rgba(0,0,0,0.5); width: 70%; height: 70%;";
     }
     return "background-color:rgba(255,255,255,0.5); width: 70%; height: 70%;";
   }
   return "";
+});
+
+const checkHover = computed(() => {
+  return (
+    state.value === BoardState.Empty &&
+    hoverRef.value &&
+    turn.value?.id === user?.id
+  );
 });
 </script>
 

@@ -7,6 +7,7 @@ import okestro.internproject.domain.game.entity.memory.GameRoom;
 import okestro.internproject.domain.game.exception.GameErrorCode;
 import okestro.internproject.domain.game.exception.GameException;
 import okestro.internproject.domain.game.service.CardMatchingService;
+import okestro.internproject.domain.game.service.GomokuService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class CommonStompController {
 
     private final CardMatchingService cardMatchingService;
+    private final GomokuService gomokuService;
 
 
     @MessageMapping("/chat/{gameTitle}/{gameRoomId}")
@@ -38,15 +40,18 @@ public class CommonStompController {
     @MessageMapping("/ready-toggle/{gameTitle}/{gameRoomId}")
     public String readyToggle(@DestinationVariable String gameTitle, @DestinationVariable UUID gameRoomId,
                               @Payload Map<String, Object> simpleUser) {
-
         try {
             switch (gameTitle) {
                 case "card-matching":
-                    GameRoom gameRoom = cardMatchingService.findById(gameRoomId)
+                    GameRoom cardMatchingRoom = cardMatchingService.findById(gameRoomId)
                             .orElseThrow(() -> new GameException(GameErrorCode.NOT_EXIST_GAME_ROOM));
-                    gameRoom.getGameRoomInfo().readyToggle(UUID.fromString(simpleUser.get("id").toString()));
+                    cardMatchingRoom.getGameRoomInfo().readyToggle(UUID.fromString(simpleUser.get("id").toString()));
+                    break;
                 case "gomoku":
-//                return gomokuService.readyToggle();
+                    GameRoom gomokuRoom = gomokuService.findById(gameRoomId)
+                            .orElseThrow(() -> new GameException(GameErrorCode.NOT_EXIST_GAME_ROOM));
+                    gomokuRoom.getGameRoomInfo().readyToggle(UUID.fromString(simpleUser.get("id").toString()));
+
             }
 
         } catch (ClassCastException e) {

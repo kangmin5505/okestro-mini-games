@@ -33,10 +33,10 @@ public class CardMatchingService extends GameStompService {
     private final OnlineUserService onlineUserService;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ObjectMapper objectMapper;
-    private final UserGameRecordService userGameStatService;
+    private final UserGameRecordService userGameRecordService;
     private final GameService gameService;
     private final UserService userService;
-    private final UserGameStatService userGameRecordService;
+    private final UserGameStatService userGameStatService;
 
 
     @Autowired
@@ -44,10 +44,10 @@ public class CardMatchingService extends GameStompService {
                                OnlineUserService onlineUserService,
                                SimpMessagingTemplate simpMessagingTemplate,
                                ObjectMapper objectMapper,
-                               UserGameRecordService userGameStatService,
+                               UserGameRecordService userGameRecordService,
                                GameService gameService,
                                UserService userService,
-                               UserGameStatService userGameRecordService) {
+                               UserGameStatService userGameStatService) {
         super(cardMatchingRepository, onlineUserService, simpMessagingTemplate, objectMapper);
         this.cardMatchingRepository = cardMatchingRepository;
         this.onlineUserService = onlineUserService;
@@ -121,8 +121,8 @@ public class CardMatchingService extends GameStompService {
                         .startTime(startTime)
                         .finishTime(finishTime)
                         .build();
-                userGameRecordService.update(player1User.getId(), GameTitle.CARD_MATCHING, true);
-                userGameRecordService.update(player2User.getId(), GameTitle.CARD_MATCHING, false);
+                userGameStatService.update(player1User.getId(), GameTitle.CARD_MATCHING, true);
+                userGameStatService.update(player2User.getId(), GameTitle.CARD_MATCHING, false);
 
             } else {
                 userGameRecord = UserGameRecord.builder()
@@ -135,10 +135,10 @@ public class CardMatchingService extends GameStompService {
                         .finishTime(finishTime)
                         .build();
 
-                userGameRecordService.update(player1User.getId(), GameTitle.CARD_MATCHING, false);
-                userGameRecordService.update(player2User.getId(), GameTitle.CARD_MATCHING, true);
+                userGameStatService.update(player1User.getId(), GameTitle.CARD_MATCHING, false);
+                userGameStatService.update(player2User.getId(), GameTitle.CARD_MATCHING, true);
             }
-            userGameStatService.save(userGameRecord);
+            userGameRecordService.save(userGameRecord);
         }
     }
 

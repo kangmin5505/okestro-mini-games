@@ -20,6 +20,9 @@ public class GameRoom {
             case CARD_MATCHING:
                 gameInstance = new CardMatchingInstance(gameRoomInfo.getPlayer1(), gameRoomInfo.getPlayer2());
                 break;
+            case GOMOKU:
+                gameInstance = new GomokuInstance(gameRoomInfo.getPlayer1(), gameRoomInfo.getPlayer2());
+                break;
         }
     }
 

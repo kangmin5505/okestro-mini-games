@@ -184,6 +184,8 @@ const flipCard = (payload: CardPayload) => {
 
 let timeoutIntervalId: NodeJS.Timer;
 watch(turnRef, () => {
+  if (!turnRef.value) return;
+
   timeoutRef.value = TIMEOUT;
   timeoutIntervalId = setInterval(timeoutInterval, 1000);
 });
