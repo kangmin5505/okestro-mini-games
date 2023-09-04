@@ -16,9 +16,7 @@ import GameRoomChat from "@/components/gameRoom/GameRoomChat.vue";
 import GameRoomUserProfile from "@/components/gameRoom/GameRoomUserProfile.vue";
 import GameRoomButtons from "@/components/gameRoom/GameRoomButtons.vue";
 import GameRoomTitle from "@/components/gameRoom/GameRoomTitle.vue";
-import { onBeforeUnmount, onMounted } from "vue";
 import { useStompStore } from "@/store/stomp";
-import { StompSubscription } from "@stomp/stompjs";
 import { useRoute } from "vue-router";
 import { useUserStore } from "@/store/user";
 
@@ -26,25 +24,26 @@ const { client } = useStompStore();
 const userStore = useUserStore();
 const { gameTitle, gameRoomId } = useRoute().params;
 
-let readyToggleSubscription: StompSubscription;
-onMounted(() => {
-  readyToggleSubscription = client.subscribe(
-    `/topic/ready-toggle/${gameTitle}/${gameRoomId}`,
-    (_) => {
-      userStore.isReady ? userStore.offReady() : userStore.onReady();
-    },
-  );
-});
-
-onBeforeUnmount(() => {
-  readyToggleSubscription.unsubscribe();
-});
+// let readyToggleSubscription: StompSubscription;
+// onMounted(() => {
+//   readyToggleSubscription = client.subscribe(
+//     `/topic/ready-toggle/${gameTitle}/${gameRoomId}`,
+//     (_) => {
+//       userStore.isReady ? userStore.offReady() : userStore.onReady();
+//     },
+//   );
+// });
+//
+// onBeforeUnmount(() => {
+//   readyToggleSubscription.unsubscribe();
+// });
 </script>
 
 <style scoped lang="scss">
 .game-room-title {
   height: 7%;
 }
+
 .users-container {
   height: 14%;
 }

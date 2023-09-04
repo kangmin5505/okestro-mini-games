@@ -64,7 +64,7 @@
   </v-container>
 </template>
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { Message } from "@/types/stomp";
 import { useUserStore } from "@/store/user";
 import { useStompStore } from "@/store/stomp";
@@ -94,7 +94,9 @@ onMounted(() => {
         from: message.from,
         content: message.content,
       });
-      scrollDown();
+      nextTick(() => {
+        scrollDown();
+      });
     },
   );
 });
@@ -118,9 +120,7 @@ const sendMessage = () => {
 
 const scrollDown = () => {
   const chatElem = document.querySelector("#chat");
-  setTimeout(() => {
-    chatElem?.scrollTo({ top: chatElem?.scrollHeight });
-  }, 0);
+  chatElem?.scrollTo({ top: chatElem?.scrollHeight });
 };
 </script>
 

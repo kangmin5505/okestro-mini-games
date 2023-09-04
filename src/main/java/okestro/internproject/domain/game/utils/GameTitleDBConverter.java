@@ -4,7 +4,7 @@ import okestro.internproject.domain.game.enums.GameTitle;
 
 import javax.persistence.AttributeConverter;
 
-public class GameTitleConverter implements AttributeConverter<GameTitle, String> {
+public class GameTitleDBConverter implements AttributeConverter<GameTitle, String> {
     @Override
     public String convertToDatabaseColumn(GameTitle attribute) {
         return attribute.getTitle();

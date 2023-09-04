@@ -2,9 +2,9 @@ package okestro.internproject.domain.game.entity.memory;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.dto.cardMatching.CardMatchDto;
+import okestro.internproject.domain.game.dto.cardMatching.CardMatchDtos;
 import okestro.internproject.domain.user.entity.SimpleUser;
 
 import java.time.LocalDateTime;
@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Getter
-@ToString
 public class CardMatchingInstance implements GameInstance {
 
     private final SimpleUser player1;
@@ -35,7 +34,7 @@ public class CardMatchingInstance implements GameInstance {
     public CardMatchingInstance(SimpleUser player1, SimpleUser player2) {
         this.player1 = player1;
         this.player2 = player2;
-        // 보드판 만들기
+
         List<String> cardItems = Arrays.asList("ASM", "C++", "C", "Dart", "Fortran", "Go", "Java", "JavaScript",
                 "Kotlin", "LISP", "Perl", "PHP", "Python", "Ruby", "Rust", "Scala", "Swift", "TypeScript");
 
@@ -64,20 +63,17 @@ public class CardMatchingInstance implements GameInstance {
 
     @Override
     public void leaveUserOnGame(UUID userId) {
-        if (userId.equals(player1.getId())) {
-            player1Score = -1;
-        } else {
-            player2Score = -1;
-        }
+        player1Score = userId.equals(player1.getId()) ? -1 : player1Score;
+        player2Score = userId.equals(player2.getId()) ? -1 : player2Score;
     }
 
     public boolean isFinished() {
         return matchedPairCount == cards.size() / 2;
     }
 
-    public boolean isMatched(List<CardMatchDto> cardMatchDtoList) {
-        CardMatchDto cardMatchDto1 = cardMatchDtoList.get(0);
-        CardMatchDto cardMatchDto2 = cardMatchDtoList.get(1);
+    public boolean isMatched(CardMatchDtos cardMatchDtos) {
+        CardMatchDto cardMatchDto1 = cardMatchDtos.getCard1();
+        CardMatchDto cardMatchDto2 = cardMatchDtos.getCard2();
 
         if (cardMatchDto1.getFaceValue().equals(cardMatchDto2.getFaceValue())) {
             int position1 = cardMatchDto1.getPosition();
@@ -93,11 +89,8 @@ public class CardMatchingInstance implements GameInstance {
     }
 
     public void addScore() {
-        if (turnId.equals(player1.getId())) {
-            player1Score++;
-        } else {
-            player2Score++;
-        }
+        player1Score += turnId.equals(player1.getId()) ? 1 : 0;
+        player2Score += turnId.equals(player2.getId()) ? 1 : 0;
     }
 
     public UUID getCurrentTurnId() {
