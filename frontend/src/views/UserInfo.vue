@@ -79,7 +79,6 @@ onUpdated(async () => {
 });
 
 const setGameRecords = async (userId: string, page: number) => {
-  // eslint-disable-next-line no-useless-catch
   try {
     const gameRecordData = await getUserGameRecords(userId, {
       page: page - 1,
@@ -88,7 +87,7 @@ const setGameRecords = async (userId: string, page: number) => {
     gameRecordsRef.value = gameRecordData.userGameRecords;
     totalElementsRef.value = gameRecordData.totalElements;
   } catch (e) {
-    throw e;
+    /* empty */
   }
 };
 
