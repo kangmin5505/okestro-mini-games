@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class GomokuRepository implements StompRepository {
+    // TODO: override
     private final Map<UUID, GameRoom> gomokuRooms = new ConcurrentHashMap<>();
 
     public void save(GameRoom gameRoom) {

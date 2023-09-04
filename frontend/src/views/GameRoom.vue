@@ -3,7 +3,6 @@
   <v-main class="bg-primary">
     <card-matching-board v-if="gameTitle == 'card-matching'" />
     <gomoku-board v-else-if="gameTitle == 'gomoku'" />
-    <pong-board v-else-if="gameTitle == 'pong'" />
   </v-main>
 </template>
 
@@ -14,7 +13,6 @@ import { onBeforeUnmount, onMounted } from "vue";
 import { StompSubscription } from "@stomp/stompjs";
 import CardMatchingBoard from "@/components/game/cardMatching/CardMatchingBoard.vue";
 import GomokuBoard from "@/components/game/gomoku/GomokuBoard.vue";
-import PongBoard from "@/components/game/pong/PongBoard.vue";
 import { useGameRoomStore } from "@/store/gameRoom";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
@@ -39,7 +37,6 @@ onMounted(() => {
     `/topic/room-maintain/${gameTitle}/${gameRoomId}`,
     (payload) => {
       const message = JSON.parse(payload.body) as RoomMaintainPayload;
-
       switch (message.type) {
         case "JOIN": {
           const content: User = message.content;
@@ -53,6 +50,10 @@ onMounted(() => {
         case "DESTROY": {
           gameRoomStore.destroyGameRoom();
           router.replace(`/games/${gameTitle}`);
+          break;
+        }
+        case "READY_TOGGLE": {
+          userStore.isReady ? userStore.offReady() : userStore.onReady();
           break;
         }
       }
@@ -72,7 +73,7 @@ if (!gameRoomStore.gameRoom || !userStore.user) {
 }
 
 userStore.joinGameRoom();
-onBeforeRouteLeave(async (to, from) => {
+onBeforeRouteLeave(async () => {
   if (userStore.isGameRoom) {
     const answer = window.confirm("게임방을 나가시겠습니까?");
     if (!answer) return false;

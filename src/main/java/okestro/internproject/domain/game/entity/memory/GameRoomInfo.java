@@ -31,6 +31,19 @@ public class GameRoomInfo {
         this.player2 = player2;
     }
 
+    public static GameRoomInfo createGameRoomInfo(String gameTitle, SimpleUser user) {
+        return GameRoomInfo.builder()
+                .id(UUID.randomUUID())
+                .title(gameTitle)
+                .userNum(1L)
+                .limitUserNum(2L)
+                .state(State.WAITING)
+                .hostId(user.getId())
+                .player1(user)
+                .player2(null)
+                .build();
+    }
+
     public void joinUser(SimpleUser player2) {
         this.player2 = player2;
         this.userNum++;

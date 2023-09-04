@@ -16,7 +16,7 @@ export interface CurrTurn {
 
 export interface CardPayload {
   position: number;
-  faceValue: String;
+  faceValue: string;
 }
 
 export interface CardMatchingCard {

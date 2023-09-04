@@ -1,7 +1,6 @@
 package okestro.internproject.domain.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.auth.jwt.provider.JwtProvider;
 import okestro.internproject.domain.user.dto.UserDetailDto;
 import okestro.internproject.domain.user.dto.UserDto;
@@ -20,7 +19,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@Slf4j
 @RequiredArgsConstructor
 public class UserController {
 
