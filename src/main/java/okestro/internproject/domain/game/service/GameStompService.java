@@ -1,44 +1,82 @@
 package okestro.internproject.domain.game.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.dto.GameRoomCreateDto;
+import okestro.internproject.domain.game.dto.common.MessageDto;
+import okestro.internproject.domain.game.entity.db.Game;
+import okestro.internproject.domain.game.entity.memory.GameInstance;
 import okestro.internproject.domain.game.entity.memory.GameRoom;
 import okestro.internproject.domain.game.entity.memory.GameRoomInfo;
+import okestro.internproject.domain.game.enums.GameMessageType;
 import okestro.internproject.domain.game.enums.GameTitle;
-import okestro.internproject.domain.game.enums.State;
 import okestro.internproject.domain.game.exception.GameErrorCode;
 import okestro.internproject.domain.game.exception.GameException;
 import okestro.internproject.domain.game.repository.stompRepository.StompRepository;
 import okestro.internproject.domain.user.entity.SimpleUser;
+import okestro.internproject.domain.user.entity.db.User;
+import okestro.internproject.domain.user.entity.db.UserGameRecord;
 import okestro.internproject.domain.user.entity.memory.OnlineUser;
 import okestro.internproject.domain.user.exception.UserErrorCode;
 import okestro.internproject.domain.user.exception.UserException;
 import okestro.internproject.domain.user.service.OnlineUserService;
+import okestro.internproject.domain.user.service.UserGameRecordService;
+import okestro.internproject.domain.user.service.UserGameStatService;
+import okestro.internproject.domain.user.service.UserService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Slf4j
 public abstract class GameStompService {
 
     private final StompRepository stompRepository;
-    private final OnlineUserService onlineUserService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
-    private final ObjectMapper objectMapper;
+    protected final OnlineUserService onlineUserService;
+    protected final SimpMessagingTemplate simpMessagingTemplate;
+    protected final GameService gameService;
+    protected final UserService userService;
+    protected final UserGameRecordService userGameRecordService;
+    protected final UserGameStatService userGameStatService;
+
 
     public abstract void startGame(UUID gameRoomId);
 
     public abstract void finishGame(GameRoom gameRoom, UUID gameRoomId);
 
+    public abstract void turnTimeout(UUID gameRoomId);
+
     public List<GameRoom> getAllGameRoom() {
         return stompRepository.findAll();
+    }
+
+    protected void saveResult(GameInstance gameInstance, GameTitle gameTitle) {
+        Game game = gameService.findByGameTitle(gameTitle)
+                .orElseThrow(() -> new GameException(GameErrorCode.NOT_EXIST_GAME));
+        User player1 = userService.findById(gameInstance.getPlayer1().getId())
+                .orElseThrow(() -> new UserException(UserErrorCode.CAN_NOT_FIND_USER));
+        User player2 = userService.findById(gameInstance.getPlayer2().getId())
+                .orElseThrow(() -> new UserException(UserErrorCode.CAN_NOT_FIND_USER));
+
+        int player1Score = gameInstance.getPlayer1Score();
+        int player2Score = gameInstance.getPlayer2Score();
+        UUID winnerId = gameInstance.getWinnerId();
+        LocalDateTime startTime = gameInstance.getStartTime();
+        LocalDateTime finishTime = gameInstance.getFinishTime();
+
+        UserGameRecord userGameRecord = UserGameRecord.builder()
+                .game(game)
+                .winUser(winnerId == player1.getId() ? player1 : player2)
+                .loseUser(winnerId == player1.getId() ? player2 : player1)
+                .winUserScore(winnerId == player1.getId() ? player1Score : player2Score)
+                .loseUserScore(winnerId == player1.getId() ? player2Score : player1Score)
+                .startTime(startTime)
+                .finishTime(finishTime)
+                .build();
+        userGameStatService.update(player1.getId(), gameTitle, winnerId == player1.getId());
+        userGameStatService.update(player2.getId(), gameTitle, winnerId == player2.getId());
+        userGameRecordService.save(userGameRecord);
     }
 
     public GameRoom createGameRoom(String gameTitle, GameRoomCreateDto gameRoomCreateDto, SimpleUser user) {
@@ -46,16 +84,7 @@ public abstract class GameStompService {
             throw new GameException(GameErrorCode.ALREADY_JOIN_GAME_ROOM);
         }
         GameRoom gameRoom = GameRoom.builder()
-                .gameRoomInfo(GameRoomInfo.builder()
-                        .id(UUID.randomUUID())
-                        .title(gameRoomCreateDto.getTitle())
-                        .userNum(1L)
-                        .limitUserNum(2L)
-                        .state(State.WAITING)
-                        .hostId(user.getId())
-                        .player1(user)
-                        .player2(null)
-                        .build())
+                .gameRoomInfo(GameRoomInfo.createGameRoomInfo(gameRoomCreateDto.getTitle(), user))
                 .gameInstance(null)
                 .build();
         stompRepository.save(gameRoom);
@@ -88,18 +117,19 @@ public abstract class GameStompService {
     }
 
     private void sendJoinMaintainMessage(String gameTitle, UUID gameRoomId, SimpleUser user) {
-
-        JsonNode joinMessage = objectMapper.createObjectNode()
-                .put("type", "JOIN")
-                .putPOJO("content", user);
-        simpMessagingTemplate.convertAndSend(String.format("/topic/room-maintain/%s/%s", gameTitle, gameRoomId), joinMessage);
+        MessageDto messageDto = MessageDto.builder()
+                .type(GameMessageType.JOIN)
+                .content(user)
+                .build();
+        simpMessagingTemplate.convertAndSend(String.format("/topic/room-maintain/%s/%s", gameTitle, gameRoomId), messageDto);
     }
 
     private void sendJoinGameRoomMessage(String gameTitle, UUID gameRoomId, SimpleUser user) {
-        JsonNode joinMessage = objectMapper.createObjectNode()
-                .put("type", "JOIN")
-                .put("content", String.format("%s님이 입장하셨습니다.", user.getNickname()));
-        simpMessagingTemplate.convertAndSend(String.format("/topic/chat/%s/%s", gameTitle, gameRoomId), joinMessage);
+        MessageDto messageDto = MessageDto.builder()
+                .type(GameMessageType.JOIN)
+                .content(String.format("%s님이 입장하셨습니다.", user.getNickname()))
+                .build();
+        simpMessagingTemplate.convertAndSend(String.format("/topic/chat/%s/%s", gameTitle, gameRoomId), messageDto);
     }
 
     public Optional<GameRoom> findById(UUID gameRoomId) {
@@ -109,34 +139,34 @@ public abstract class GameStompService {
     public void deleteGameRoom(GameTitle gameTitle, UUID gameRoomId, SimpleUser user) {
         GameRoom gameRoom = stompRepository.findById(gameRoomId)
                 .orElseThrow(() -> new GameException(GameErrorCode.NOT_EXIST_GAME_ROOM));
+        GameRoomInfo gameRoomInfo = gameRoom.getGameRoomInfo();
+        gameRoom.getGameInstance()
+                .ifPresent(gameInstance -> {
+                    if (gameRoomInfo.isOnGame()) {
+                        gameInstance.leaveUserOnGame(user.getId());
+                        finishGame(gameRoom, gameRoomId);
+                    }
+                });
 
-        if (gameRoom.getGameRoomInfo().isOnGame()) {
-            gameRoom.getGameInstance().leaveUserOnGame(user.getId());
-            finishGame(gameRoom, gameRoomId);
-        }
-
-        UUID hostId = gameRoom.getGameRoomInfo().getHostId();
+        UUID hostId = gameRoomInfo.getHostId();
         UUID userId = user.getId();
-
         if (hostId.equals(userId)) {
-            JsonNode destroyJson = objectMapper.createObjectNode()
-                    .put("type", "DESTROY");
+            MessageDto messageDto = MessageDto.builder()
+                    .type(GameMessageType.DESTROY)
+                    .build();
 
-            if (gameRoom.getGameRoomInfo().getPlayer2() != null) {
-                OnlineUser onlineUser = onlineUserService.findByUserId(gameRoom.getGameRoomInfo().getPlayer2().getId())
+            if (gameRoomInfo.getPlayer2() != null) {
+                OnlineUser onlineUser = onlineUserService.findByUserId(gameRoomInfo.getPlayer2().getId())
                         .orElseThrow(() -> new UserException(UserErrorCode.CAN_NOT_FIND_USER));
                 onlineUserService.exitGameRoom(onlineUser.getUser().getId());
             }
-
-            simpMessagingTemplate.convertAndSend(String.format("/topic/room-maintain/%s/%s", gameTitle.getTitle(), gameRoomId), destroyJson);
+            simpMessagingTemplate.convertAndSend(String.format("/topic/room-maintain/%s/%s", gameTitle.getTitle(), gameRoomId), messageDto);
             stompRepository.deleteById(gameRoomId);
         } else {
-            gameRoom.getGameRoomInfo().exitUser();
-
+            gameRoomInfo.exitUser();
             sendLeaveMaintainMessage(gameTitle.getTitle(), gameRoomId, user);
             sendLeaveRoomMessage(gameTitle.getTitle(), gameRoomId, user);
         }
-
 
         OnlineUser onlineUser = onlineUserService.findByUserId(user.getId())
                 .orElseThrow(() -> new UserException(UserErrorCode.CAN_NOT_FIND_USER));
@@ -144,21 +174,22 @@ public abstract class GameStompService {
     }
 
     private void sendLeaveMaintainMessage(String gameTitle, UUID gameRoomId, SimpleUser user) {
-        ObjectNode contentJson = objectMapper.createObjectNode()
-                .put("id", user.getId().toString());
+        Map<String, Object> content = new HashMap<>();
+        content.put("id", user.getId());
 
-        JsonNode leaveJson = objectMapper.createObjectNode()
-                .put("type", "LEAVE")
-                .set("content", contentJson);
-
-        simpMessagingTemplate.convertAndSend(String.format("/topic/room-maintain/%s/%s", gameTitle, gameRoomId), leaveJson);
+        MessageDto messageDto = MessageDto.builder()
+                .type(GameMessageType.LEAVE)
+                .content(content)
+                .build();
+        simpMessagingTemplate.convertAndSend(String.format("/topic/room-maintain/%s/%s", gameTitle, gameRoomId), messageDto);
     }
 
     private void sendLeaveRoomMessage(String gameTitle, UUID gameRoomId, SimpleUser user) {
-        JsonNode leaveMessage = objectMapper.createObjectNode()
-                .put("type", "LEAVE")
-                .put("content", String.format("%s님이 퇴장하셨습니다.", user.getNickname()));
-        simpMessagingTemplate.convertAndSend(String.format("/topic/chat/%s/%s", gameTitle, gameRoomId), leaveMessage);
+        MessageDto messageDto = MessageDto.builder()
+                .type(GameMessageType.LEAVE)
+                .content(String.format("%s님이 퇴장하셨습니다.", user.getNickname()))
+                .build();
+        simpMessagingTemplate.convertAndSend(String.format("/topic/chat/%s/%s", gameTitle, gameRoomId), messageDto);
     }
 
     public boolean isCanStartGame(UUID gameRoomId, SimpleUser user) {

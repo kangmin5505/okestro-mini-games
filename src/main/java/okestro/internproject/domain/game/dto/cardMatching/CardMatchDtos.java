@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CardMatchDto {
-    private int position;
-    private String faceValue;
+public class CardMatchDtos {
+    private CardMatchDto card1;
+    private CardMatchDto card2;
 }

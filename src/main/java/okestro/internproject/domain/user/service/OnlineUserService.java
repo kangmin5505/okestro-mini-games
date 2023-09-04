@@ -9,7 +9,6 @@ import okestro.internproject.domain.user.exception.UserException;
 import okestro.internproject.domain.user.repository.OnlineUserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,7 +48,6 @@ public class OnlineUserService {
     }
 
     public void removeOnlineUser(SimpleUser user) {
-        List<OnlineUser> all = onlineUserRepository.findAll();
         onlineUserRepository.deleteById(user.getId());
     }
 

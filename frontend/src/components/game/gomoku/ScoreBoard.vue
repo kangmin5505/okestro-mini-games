@@ -54,11 +54,12 @@ import { useGameRoomStore } from "@/store/gameRoom";
 import { CurrTurn } from "@/types/cardMatching";
 import { GameRoom } from "@/types/game";
 import { computed, toRefs } from "vue";
+import { GomokuStoneColor } from "@/types/gomoku";
 
 const props = defineProps<{
   turnRef: CurrTurn | null;
   timeoutRef: number;
-  userStoneColor: { blackUserId: string; whiteUserId: string };
+  userStoneColor: GomokuStoneColor | null;
 }>();
 
 const { gameRoom } = useGameRoomStore() as {
@@ -67,22 +68,22 @@ const { gameRoom } = useGameRoomStore() as {
 const { turnRef, userStoneColor } = toRefs(props);
 
 const player1StoneColor = computed(() => {
-  return userStoneColor.value.blackUserId === gameRoom.player1?.id
+  return userStoneColor?.value?.blackUserId === gameRoom.player1?.id
     ? "bg-black"
     : "bg-white";
 });
 const player1FontColor = computed(() => {
-  return userStoneColor.value.blackUserId === gameRoom.player1?.id
+  return userStoneColor?.value?.blackUserId === gameRoom.player1?.id
     ? "text-white"
     : "text-black";
 });
 const player2StoneColor = computed(() => {
-  return userStoneColor.value.blackUserId === gameRoom.player2?.id
+  return userStoneColor?.value?.blackUserId === gameRoom.player2?.id
     ? "bg-black"
     : "bg-white";
 });
 const player2FontColor = computed(() => {
-  return userStoneColor.value.blackUserId === gameRoom.player2?.id
+  return userStoneColor?.value?.blackUserId === gameRoom.player2?.id
     ? "text-white"
     : "text-black";
 });

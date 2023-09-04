@@ -36,7 +36,6 @@ public class GameController {
     private final GomokuService gomokuService;
     private final Map<GameTitle, GameStompService> gameStompServices = new ConcurrentHashMap<>();
 
-
     @PostConstruct
     public void init() {
         gameStompServices.put(GameTitle.CARD_MATCHING, cardMatchingService);

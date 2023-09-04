@@ -11,6 +11,7 @@
       v-if="state === BoardState.Black || state === BoardState.White"
       class="stone"
       :class="[stoneColor]"
+      :style="prevStoneUI"
     />
     <div v-else-if="checkHover" class="stone" :style="hoverStyle" />
   </v-container>
@@ -18,7 +19,7 @@
 
 <script setup lang="ts">
 import { computed, ref, toRefs } from "vue";
-import { BoardState, CurrTurn } from "@/types/gomoku";
+import { BoardState, CurrTurn, GomokuStoneColor, Stone } from "@/types/gomoku";
 import { useUserStore } from "@/store/user";
 
 const props = defineProps<{
@@ -27,12 +28,11 @@ const props = defineProps<{
   COLUMNS: number;
   state: BoardState;
   turn: CurrTurn | null;
-  userStoneColor: {
-    blackUserId: string;
-    whiteUserId: string;
-  } | null;
+  userStoneColor: GomokuStoneColor | null;
+  prevStone: Stone | null;
 }>();
-const { row, col, COLUMNS, state, turn, userStoneColor } = toRefs(props);
+const { row, col, COLUMNS, state, turn, userStoneColor, prevStone } =
+  toRefs(props);
 const hoverRef = ref(false);
 const { user } = useUserStore();
 
@@ -69,7 +69,7 @@ const stoneColor = computed(() => {
 });
 
 const hoverStyle = computed(() => {
-  if (!turn.value) return;
+  if (!turn.value || !userStoneColor.value) return;
 
   if (turn.value.id === user?.id && hoverRef.value) {
     if (turn.value.id === userStoneColor.value.blackUserId) {
@@ -86,6 +86,18 @@ const checkHover = computed(() => {
     hoverRef.value &&
     turn.value?.id === user?.id
   );
+});
+
+const prevStoneUI = computed(() => {
+  if (!prevStone.value) return;
+
+  if (
+    prevStone.value.row === row.value + 1 &&
+    prevStone.value.col === col.value + 1
+  ) {
+    return "border: 2px solid red;position: absolute;";
+  }
+  return "";
 });
 </script>
 

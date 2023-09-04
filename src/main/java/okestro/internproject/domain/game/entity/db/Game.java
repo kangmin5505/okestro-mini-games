@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import okestro.internproject.domain.game.enums.GameTitle;
-import okestro.internproject.domain.game.utils.GameTitleConverter;
+import okestro.internproject.domain.game.utils.GameTitleDBConverter;
 import okestro.internproject.global.entity.BaseDateTimeEntity;
 
 import javax.persistence.*;
@@ -17,7 +17,7 @@ public class Game extends BaseDateTimeEntity {
     @Id
     @Column(nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
-    @Convert(converter = GameTitleConverter.class)
+    @Convert(converter = GameTitleDBConverter.class)
     private GameTitle title;
 
     public String getTitle() {

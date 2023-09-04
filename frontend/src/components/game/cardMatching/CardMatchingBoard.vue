@@ -24,15 +24,10 @@
         />
       </TransitionGroup>
     </v-container>
-    <v-dialog v-model="dialogRef" class="w-50" persistent no-click-animation>
-      <v-card-text
-        v-if="winnerNicknameRef.length > 0"
-        class="text-h4 font-italic text-white font-weight-black text-center"
-      >
-        {{ winnerNicknameRef }} 님이 승리하셨습니다!
-        <v-icon color="green" icon="mdi-emoticon-excited" />
-      </v-card-text>
-    </v-dialog>
+    <winner-dialog
+      v-model:dialog="dialogRef"
+      :winner-nickname="winnerNicknameRef"
+    />
   </v-container>
 </template>
 
@@ -52,6 +47,7 @@ import {
   CardPayload,
   CurrTurn,
 } from "@/types/cardMatching";
+import WinnerDialog from "@/components/common/WinnerDialog.vue";
 
 const TIMEOUT = 10;
 const cardsRef = ref<CardMatchingCard[]>([]);
@@ -94,13 +90,10 @@ onMounted(() => {
 
             if (turnRef?.value?.id === userStore.user?.id) {
               client.publish({
-                destination: `/app/card-matching/${gameRoomId}`,
+                destination: `/app/card-matching/${gameRoomId}/check-match`,
                 body: JSON.stringify({
-                  type: "CHECK_MATCH",
-                  content: {
-                    card1: userSelectionRef.value[0],
-                    card2: userSelectionRef.value[1],
-                  },
+                  card1: userSelectionRef.value[0],
+                  card2: userSelectionRef.value[1],
                 }),
               });
             }
@@ -122,7 +115,6 @@ onMounted(() => {
           clearInterval(timeoutIntervalId);
           break;
         }
-
         case "SCORE_CHANGE":
           scoreRef.value.player1 = message.content.player1Score;
           scoreRef.value.player2 = message.content.player2Score;
@@ -150,7 +142,6 @@ onMounted(() => {
             });
             cardsRef.value = [];
           }, 5000);
-
           break;
         }
       }
@@ -164,8 +155,7 @@ onBeforeUnmount(() => {
 });
 
 const isTurn = computed(() => {
-  if (!turnRef.value) return false;
-  return turnRef.value.id === userStore.user?.id;
+  return !!turnRef.value && turnRef.value.id === userStore.user?.id;
 });
 
 const flipCard = (payload: CardPayload) => {
@@ -196,7 +186,7 @@ const timeoutInterval = () => {
   } else {
     if (turnRef?.value?.id === userStore.user?.id) {
       client.publish({
-        destination: `/app/card-matching/${gameRoomId}`,
+        destination: `/app/card-matching/${gameRoomId}/timeout`,
         body: JSON.stringify({
           type: "TIMEOUT",
         }),
@@ -225,7 +215,6 @@ watch(
           cardsRef.value[cardTwo.position].visible = false;
         }, 1000);
       }
-
       userSelectionRef.value.length = 0;
     }
   },

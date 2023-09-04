@@ -16,6 +16,6 @@ export interface GameRoom {
 }
 
 export interface RoomMaintainPayload {
-  type: "JOIN" | "LEAVE" | "DESTROY";
+  type: "JOIN" | "LEAVE" | "DESTROY" | "READY_TOGGLE";
   content: any;
 }

@@ -44,7 +44,7 @@ const readyButtonText = computed(() => {
 
 const clickReadyToggle = () => {
   client.publish({
-    destination: `/app/ready-toggle/${gameTitle}/${gameRoomId}`,
+    destination: `/app/room-maintain/${gameTitle}/${gameRoomId}/ready-toggle`,
     body: JSON.stringify(userStore.user),
   });
 };

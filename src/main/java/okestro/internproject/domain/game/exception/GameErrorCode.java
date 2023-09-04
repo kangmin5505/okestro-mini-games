@@ -16,7 +16,9 @@ public enum GameErrorCode implements ErrorCode {
     NOT_ENOUGH_PLAYERS(HttpStatus.BAD_REQUEST, "플레이어가 부족합니다."),
     ALREADY_START_GAME(HttpStatus.BAD_REQUEST, "이미 게임이 시작되었습니다."),
     NOT_EXIST_GAME_ROOM(HttpStatus.BAD_REQUEST, "존재하지 않는 방입니다."),
-    ALREADY_JOIN_GAME_ROOM(HttpStatus.BAD_REQUEST, "이미 게임방에 참여중입니다.");
+    ALREADY_JOIN_GAME_ROOM(HttpStatus.BAD_REQUEST, "이미 게임방에 참여중입니다."),
+    NOT_EXIST_GAME_INSTANCE(HttpStatus.BAD_REQUEST, "존재하지 않는 게임입니다."),
+    NOT_EXIST_GAME(HttpStatus.BAD_REQUEST, "존재하지 않는 게임입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

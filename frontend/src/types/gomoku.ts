@@ -13,15 +13,12 @@ export interface CurrTurn {
   id: string;
 }
 
-// export interface CardPayload {
-//   position: number;
-//   faceValue: String;
-// }
-//
-// export interface CardMatchingCard {
-//   value: string;
-//   visible: boolean;
-//   position: number;
-//   matched: boolean;
-//   matchedBy: string;
-// }
+export interface GomokuStoneColor {
+  blackUserId: string;
+  whiteUserId: string;
+}
+
+export interface Stone {
+  row: number;
+  col: number;
+}

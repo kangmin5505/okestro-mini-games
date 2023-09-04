@@ -16,13 +16,13 @@ import java.util.UUID;
 public class GomokuInstance implements GameInstance {
 
     static private final int BOARD_SIZE = 15;
-    static private final int[][] startMoved = {
+    static private final int[][] startDirections = {
             {0, -1},
             {-1, -1},
             {-1, 0},
             {1, -1}
     };
-    static private final int[][] currMoved = {
+    static private final int[][] moveDirections = {
             {0, 1},
             {1, 1},
             {1, 0},
@@ -49,33 +49,29 @@ public class GomokuInstance implements GameInstance {
         this.board = new GomokuBoardState[BOARD_SIZE + 1][BOARD_SIZE + 1];
         for (int row = 1; row <= BOARD_SIZE; row++) {
             for (int col = 1; col <= BOARD_SIZE; col++)
-                board[row][col] = GomokuBoardState.EMPTY;
+                putStone(row, col, GomokuBoardState.EMPTY);
         }
-        blackUserId = Math.random() < 0.5 ? player1.getId() : player2.getId();
-        whiteUserId = blackUserId == player1.getId() ? player2.getId() : player1.getId();
+        blackUserId = (Math.random() < 0.5) ?
+                player1.getId() : player2.getId();
+        whiteUserId = (blackUserId == player1.getId()) ?
+                player2.getId() : player1.getId();
         startTime = LocalDateTime.now();
     }
 
     public PutResult putStone(int row, int col) {
-        switch (isCanPutStone(row, col)) {
-            case DOUBLE_THREE:
-                return PutResult.DOUBLE_THREE;
-            case DOUBLE_FOUR:
-                return PutResult.DOUBLE_FOUR;
-            case OVER_FIVE:
-                return PutResult.OVER_FIVE;
-            case FAIL:
-                return PutResult.FAIL;
+        PutResult putResult = isCanPutStone(row, col);
+        if (putResult.equals(PutResult.SUCCESS)) {
+            putStone(row, col, getCurrentTurnStone());
+            if (isFinished(row, col)) {
+                finishGame();
+                return PutResult.FINISH;
+            }
         }
+        return putResult;
+    }
 
-        board[row][col] = getCurrentTurnStone();
-
-        if (isFinished()) {
-            finishGame();
-            return PutResult.FINISH;
-        }
-
-        return PutResult.SUCCESS;
+    private void putStone(int row, int col, GomokuBoardState stone) {
+        board[row][col] = stone;
     }
 
     @Override
@@ -84,35 +80,34 @@ public class GomokuInstance implements GameInstance {
 
     @Override
     public void finishGame() {
+        if (currTurn.equals(GomokuTurn.BLACK)) {
+            player1Score += player1.getId().equals(blackUserId) ? 1 : 0;
+            player2Score += player2.getId().equals(blackUserId) ? 1 : 0;
+        } else {
+            player1Score += player1.getId().equals(whiteUserId) ? 1 : 0;
+            player2Score += player2.getId().equals(whiteUserId) ? 1 : 0;
+        }
         finishTime = LocalDateTime.now();
     }
 
     @Override
     public UUID changeTurnId() {
-        if (this.currTurn == null) {
-            this.currTurn = GomokuTurn.BLACK;
-            return blackUserId;
-        } else if (this.currTurn.equals(GomokuTurn.BLACK)) {
-            this.currTurn = GomokuTurn.WHITE;
-            return whiteUserId;
-        } else {
-            this.currTurn = GomokuTurn.BLACK;
-            return blackUserId;
-        }
+        this.currTurn = (this.currTurn == GomokuTurn.BLACK) ?
+                GomokuTurn.WHITE : GomokuTurn.BLACK;
+        return this.currTurn.equals(GomokuTurn.BLACK) ?
+                blackUserId : whiteUserId;
     }
 
     @Override
     public UUID getWinnerId() {
-        return player1Score > player2Score ? player1.getId() : player2.getId();
+        return player1Score > player2Score ?
+                player1.getId() : player2.getId();
     }
 
     @Override
     public void leaveUserOnGame(UUID userId) {
-        if (userId.equals(player1.getId())) {
-            player1Score = -1;
-        } else {
-            player2Score = -1;
-        }
+        player1Score = userId.equals(player1.getId()) ? -1 : player1Score;
+        player2Score = userId.equals(player2.getId()) ? -1 : player2Score;
     }
 
     public PutResult isCanPutStone(int row, int col) {
@@ -120,27 +115,13 @@ public class GomokuInstance implements GameInstance {
             return PutResult.FAIL;
         }
 
-        board[row][col] = getCurrentTurnStone();
-
-        if (getCurrentTurnStone().equals(GomokuBoardState.BLACK)) {
-            switch (checkForbidden(row, col)) {
-                case DOUBLE_THREE: {
-                    board[row][col] = GomokuBoardState.EMPTY;
-                    return PutResult.DOUBLE_THREE;
-                }
-                case DOUBLE_FOUR: {
-                    board[row][col] = GomokuBoardState.EMPTY;
-                    return PutResult.DOUBLE_FOUR;
-                }
-                case OVER_FIVE: {
-                    board[row][col] = GomokuBoardState.EMPTY;
-                    return PutResult.OVER_FIVE;
-                }
-            }
-        }
-        board[row][col] = GomokuBoardState.EMPTY;
-        return PutResult.SUCCESS;
+        putStone(row, col, getCurrentTurnStone());
+        PutResult putResult = getCurrentTurnStone().equals(GomokuBoardState.BLACK) ?
+                checkForbidden(row, col) : PutResult.SUCCESS;
+        putStone(row, col, GomokuBoardState.EMPTY);
+        return putResult;
     }
+
 
     public PutResult checkForbidden(int row, int col) {
         if (checkOverFive(row, col)) {
@@ -154,24 +135,22 @@ public class GomokuInstance implements GameInstance {
     }
 
     private boolean checkOverFive(int row, int col) {
-        for (int d = 0; d < currMoved.length; ++d) {
+        for (int[] moveDirection : moveDirections) {
             int count = 0;
             for (int k = 1; k < 5; ++k) {
-                int currRow = row + k * currMoved[d][0];
-                int currCol = col + k * currMoved[d][1];
+                int movedRow = row + k * moveDirection[0];
+                int movedCol = col + k * moveDirection[1];
 
-                if (!isInRange(currRow, currCol) ||
-                        board[currRow][currCol] != getCurrentTurnStone()) {
+                if (!isValidStone(movedRow, movedCol, GomokuBoardState.BLACK)) {
                     break;
                 }
                 count++;
             }
             for (int k = 1; k < 5; ++k) {
-                int currRow = row - k * currMoved[d][0];
-                int currCol = col - k * currMoved[d][1];
+                int movedRow = row - k * moveDirection[0];
+                int movedCol = col - k * moveDirection[1];
 
-                if (!isInRange(currRow, currCol) ||
-                        board[currRow][currCol] != getCurrentTurnStone()) {
+                if (!isValidStone(movedRow, movedCol, GomokuBoardState.BLACK)) {
                     break;
                 }
                 count++;
@@ -183,10 +162,14 @@ public class GomokuInstance implements GameInstance {
         return false;
     }
 
+    private boolean isValidStone(int row, int col, GomokuBoardState stone) {
+        return isInRange(row, col) && board[row][col] == stone;
+    }
+
     private boolean checkDoubleFour(int row, int col) {
         int count = 0;
         int checkStoneCount = 5;
-        for (int d = 0; d < startMoved.length; ++d) {
+        for (int d = 0; d < startDirections.length; ++d) {
             count += checkDoubleOneDirection(row, col, d, checkStoneCount);
         }
         return count >= 2;
@@ -195,7 +178,7 @@ public class GomokuInstance implements GameInstance {
     private boolean checkDoubleThree(int row, int col) {
         int count = 0;
         int checkStoneCount = 4;
-        for (int d = 0; d < startMoved.length; ++d) {
+        for (int d = 0; d < startDirections.length; ++d) {
             count += checkDoubleOneDirection(row, col, d, checkStoneCount);
         }
         return count >= 2;
@@ -203,38 +186,37 @@ public class GomokuInstance implements GameInstance {
 
     private int checkDoubleOneDirection(int row, int col, int d, int checkStoneCount) {
         int count = 0;
-
         for (int k = 0; k < checkStoneCount; ++k) {
-            int startRow = row + k * startMoved[d][0];
-            int startCol = col + k * startMoved[d][1];
+            int startRow = row + k * startDirections[d][0];
+            int startCol = col + k * startDirections[d][1];
 
-            if (!isInRange(startRow, startCol) ||
-                    board[startRow][startCol] != GomokuBoardState.BLACK) {
+            if (!isValidStone(startRow, startCol, GomokuBoardState.BLACK)) {
                 continue;
             }
 
             int stoneCount = 0;
             int canEmpty = 1;
             for (int m = 0; m < 5; ++m) {
-                int currRow = startRow + m * currMoved[d][0];
-                int currCol = startCol + m * currMoved[d][1];
+                int movedRow = startRow + m * moveDirections[d][0];
+                int movedCol = startCol + m * moveDirections[d][1];
 
-                if (!isValidCondition(currRow, currCol, canEmpty)) {
+                if (!isValidCondition(movedRow, movedCol, canEmpty)) {
                     break;
                 }
 
-                if (board[currRow][currCol] == GomokuBoardState.EMPTY) {
-                    canEmpty--;
+                canEmpty = (board[movedRow][movedCol] == GomokuBoardState.EMPTY) ?
+                        canEmpty - 1 : canEmpty;
+                stoneCount = (board[movedRow][movedCol] == GomokuBoardState.EMPTY) ?
+                        stoneCount : stoneCount + 1;
+
+                if (checkStoneCount == 4) {
+                    if (stoneCount == 3 && isValidThreeStones(startRow, startCol, canEmpty, d)) {
+                        count++;
+                        break;
+                    }
                 } else {
-                    stoneCount++;
-                    if (checkStoneCount == 4) {
-                        if (stoneCount == 3 && isValidThreeStones(startRow, startCol, canEmpty, d)) {
-                            count++;
-                            break;
-                        }
-                    } else {
-                        if (stoneCount == 4 && isValidFourStones(startRow, startCol, canEmpty, d))
-                            count++;
+                    if (stoneCount == 4 && isValidFourStones(startRow, startCol, canEmpty, d)) {
+                        count++;
                         break;
                     }
                 }
@@ -244,96 +226,63 @@ public class GomokuInstance implements GameInstance {
     }
 
     private boolean isValidFourStones(int startRow, int startCol, int canEmpty, int d) {
-        int currRow = startRow + startMoved[d][0];
-        int currCol = startCol + startMoved[d][1];
-        int lastRow = startRow + currMoved[d][0] * 4;
-        int lastCol = startCol + currMoved[d][1] * 4;
+        int prevRow = startRow + startDirections[d][0];
+        int prevCol = startCol + startDirections[d][1];
+        int lastNextRow = startRow + moveDirections[d][0] * 4;
+        int lastNextCol = startCol + moveDirections[d][1] * 4;
 
         if (canEmpty == 1) {
-            if (!isInRange(currRow, currCol) ||
-                    board[currRow][currCol] == GomokuBoardState.WHITE) {
-                if (!isInRange(lastRow, lastCol) ||
-                        board[lastRow][lastCol] == GomokuBoardState.WHITE) {
-                    return false;
-                }
-            }
-
-            if ((isInRange(currRow, currCol) &&
-                    board[currRow][currCol] == GomokuBoardState.BLACK) ||
-                    (isInRange(lastRow, lastCol) &&
-                            board[lastRow][lastCol] == GomokuBoardState.BLACK)) {
+            if (isBlocked(prevRow, prevCol, GomokuBoardState.WHITE) &&
+                    isBlocked(lastNextRow, lastNextCol, GomokuBoardState.WHITE)) {
                 return false;
             }
         } else {
-            int nextRow = startRow + currMoved[d][0] * 5;
-            int nextCol = startCol + currMoved[d][1] * 5;
-
-            if ((isInRange(currRow, currCol) && board[currRow][currCol] == GomokuBoardState.BLACK) ||
-                    isInRange(nextRow, nextCol) && board[nextRow][nextCol] == GomokuBoardState.BLACK) {
-                return false;
-            }
+            lastNextRow += moveDirections[d][0];
+            lastNextCol += moveDirections[d][1];
         }
-        return true;
+        return !(isValidStone(prevRow, prevCol, GomokuBoardState.BLACK) ||
+                isValidStone(lastNextRow, lastNextCol, GomokuBoardState.BLACK));
+    }
+
+    private boolean isBlocked(int row, int col, GomokuBoardState stone) {
+        return (!isInRange(row, col) || board[row][col] == stone);
     }
 
     private boolean isValidThreeStones(int startRow, int startCol, int canEmpty, int d) {
-        int currRow = startRow + startMoved[d][0];
-        int currCol = startCol + startMoved[d][1];
+        int prevRow = startRow + startDirections[d][0];
+        int prevCol = startCol + startDirections[d][1];
 
+        int beforePrevRow = startRow + startDirections[d][0] * 2;
+        int beforePrevCol = startCol + startDirections[d][1] * 2;
+        int afterNextRow = startRow + moveDirections[d][0] * 4;
+        int afterNextCol = startCol + moveDirections[d][1] * 4;
 
-        int prevCurrRow = startRow + currMoved[d][0] * 2;
-        int prevCurrCol = startCol + currMoved[d][1] * 2;
-        int nextLastRow = startRow + currMoved[d][0] * 4;
-        int nextLastCol = startCol + currMoved[d][1] * 4;
-
+        if (isBlocked(prevRow, prevCol, GomokuBoardState.WHITE)) {
+            return false;
+        }
 
         if (canEmpty == 1) {
-            if (!isInRange(currRow, currCol) ||
-                    board[currRow][currCol] == GomokuBoardState.WHITE) {
+            int lastRow = startRow + moveDirections[d][0] * 3;
+            int lastCol = startCol + moveDirections[d][1] * 3;
+
+            if (isBlocked(lastRow, lastCol, GomokuBoardState.WHITE)) {
+                return false;
+            }
+            if (isValidStone(prevRow, prevCol, GomokuBoardState.BLACK) ||
+                    isValidStone(lastRow, lastCol, GomokuBoardState.BLACK)) {
                 return false;
             }
 
-            int lastRow = startRow + currMoved[d][0] * 3;
-            int lastCol = startCol + currMoved[d][1] * 3;
-
-            if (!isInRange(lastRow, lastCol) || board[lastRow][lastCol] == GomokuBoardState.WHITE) {
-                return false;
-            }
-
-            if ((isInRange(currRow, currCol) &&
-                    board[currRow][currCol] == GomokuBoardState.BLACK) ||
-                    (isInRange(lastRow, lastCol) &&
-                            board[currRow][currCol] == GomokuBoardState.BLACK)) {
-                return false;
-            }
-
-            if (isInRange(prevCurrRow, prevCurrCol) &&
-                    board[prevCurrRow][prevCurrCol] == GomokuBoardState.WHITE &&
-                    isInRange(nextLastRow, nextLastCol) &&
-                    board[nextLastRow][nextLastCol] == GomokuBoardState.WHITE) {
-                return false;
-            }
+            return !(isValidStone(beforePrevRow, beforePrevCol, GomokuBoardState.WHITE) &&
+                    isValidStone(afterNextRow, afterNextCol, GomokuBoardState.WHITE));
         } else {
-            if (!isInRange(currRow, currCol) ||
-                    board[currRow][currCol] == GomokuBoardState.WHITE) {
+            if (isValidStone(afterNextRow, afterNextCol, GomokuBoardState.WHITE)) {
                 return false;
             }
 
-            if (!isInRange(nextLastRow, nextLastCol)
-                    || board[nextLastRow][nextLastCol] == GomokuBoardState.WHITE) {
-                return false;
-            }
-
-            if (
-                    (isInRange(currRow, currCol) &&
-                            board[currRow][currCol] == GomokuBoardState.BLACK) ||
-                            (isInRange(nextLastRow, nextLastCol) &&
-                                    board[nextLastRow][nextLastCol] == GomokuBoardState.BLACK)
-            ) {
-                return false;
-            }
+            return !(isValidStone(prevRow, prevCol, GomokuBoardState.BLACK) ||
+                    isValidStone(afterNextRow, afterNextCol, GomokuBoardState.BLACK));
         }
-        return true;
     }
 
     private boolean isValidCondition(int currRow, int currCol, int canEmpty) {
@@ -345,76 +294,33 @@ public class GomokuInstance implements GameInstance {
                 ;
     }
 
-    public boolean isFinished() {
-        for (int row = 1; row <= BOARD_SIZE; ++row) {
-            for (int col = 1; col <= BOARD_SIZE; ++col) {
-                if (checkHorizontal(row, col)
-                        || checkVertical(row, col)
-                        || checkDiagonal(row, col)) {
-                    if (currTurn.equals(GomokuTurn.BLACK))
-                        if (player1.getId().equals(blackUserId)) {
-                            player1Score++;
-                        } else {
-                            player2Score++;
-                        }
-                    else {
-                        if (player1.getId().equals(whiteUserId)) {
-                            player1Score++;
-                        } else {
-                            player2Score++;
-                        }
-                    }
-                    return true;
+    public boolean isFinished(int row, int col) {
+        for (int[] moveDirection : moveDirections) {
+            int count = 1;
+            for (int k = 1; k < 5; ++k) {
+                int movedRow = row + k * moveDirection[0];
+                int movedCol = col + k * moveDirection[1];
+
+                if (!isValidStone(movedRow, movedCol, getCurrentTurnStone())) {
+                    break;
                 }
+                count++;
+            }
+            for (int k = 1; k < 5; ++k) {
+                int movedRow = row - k * moveDirection[0];
+                int movedCol = col - k * moveDirection[1];
+
+                if (!isValidStone(movedRow, movedCol, getCurrentTurnStone())) {
+                    break;
+                }
+                count++;
+            }
+            if (count >= 5) {
+                return true;
             }
         }
         return false;
     }
-
-
-    private boolean checkHorizontal(int row, int col) {
-        for (int i = 0; i < 5; ++i) {
-            if (!isInRange(row, col + i) || board[row][col + i] != getCurrentTurnStone()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean checkVertical(int row, int col) {
-        for (int i = 0; i < 5; ++i) {
-            if (!isInRange(row + i, col) || board[row + i][col] != getCurrentTurnStone()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean checkDiagonal(int row, int col) {
-        return (
-                checkDiagonalFromRightTop(row, col) ||
-                        checkDiagonalFromLeftTop(row, col)
-        );
-    }
-
-    private boolean checkDiagonalFromRightTop(int row, int col) {
-        for (int i = 0; i < 5; ++i) {
-            if (!isInRange(row + i, col - i) || board[row + i][col - i] != getCurrentTurnStone()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean checkDiagonalFromLeftTop(int row, int col) {
-        for (int i = 0; i < 5; ++i) {
-            if (!isInRange(row + i, col + i) || board[row + i][col + i] != getCurrentTurnStone()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
     public GomokuBoardState getCurrentTurnStone() {
         return currTurn.equals(GomokuTurn.BLACK) ? GomokuBoardState.BLACK : GomokuBoardState.WHITE;
