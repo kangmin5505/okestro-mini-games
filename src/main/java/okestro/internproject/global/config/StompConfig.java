@@ -2,7 +2,9 @@ package okestro.internproject.global.config;
 
 import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.auth.oauth2.principal.PrincipalDetails;
+import okestro.internproject.domain.game.enums.GameTitle;
 import okestro.internproject.domain.game.service.CardMatchingService;
+import okestro.internproject.domain.game.service.GomokuService;
 import okestro.internproject.domain.user.entity.SimpleUser;
 import okestro.internproject.domain.user.entity.memory.OnlineUser;
 import okestro.internproject.domain.user.exception.UserErrorCode;
@@ -34,12 +36,16 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
 
     private final OnlineUserService onlineUserService;
     private final CardMatchingService cardMatchingService;
+    private final GomokuService gomokuService;
 
 
     @Autowired
-    public StompConfig(OnlineUserService onlineUserService, @Lazy CardMatchingService cardMatchingService) {
+    public StompConfig(OnlineUserService onlineUserService,
+                       @Lazy CardMatchingService cardMatchingService,
+                       @Lazy GomokuService gomokuService) {
         this.onlineUserService = onlineUserService;
         this.cardMatchingService = cardMatchingService;
+        this.gomokuService = gomokuService;
     }
 
     @Value("${app.fe.http-url}")
@@ -96,8 +102,10 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
 
         switch (gameTitle) {
             case "card-matching":
-                cardMatchingService.deleteGameRoom(gameRoomId, user);
+                cardMatchingService.deleteGameRoom(GameTitle.CARD_MATCHING, gameRoomId, user);
                 break;
+            case "gomoku":
+                gomokuService.deleteGameRoom(GameTitle.GOMOKU, gameRoomId, user);
             default:
                 break;
         }

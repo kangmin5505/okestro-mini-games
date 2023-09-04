@@ -38,4 +38,4 @@ app:
 
 logging:
   level:
-    web: debug
+    web: INFO

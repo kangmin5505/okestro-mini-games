@@ -37,7 +37,6 @@ public class GlobalExceptionHandler {
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .message(message)
                 .build();
-
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -49,6 +48,5 @@ public class GlobalExceptionHandler {
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .message("잘못된 요청입니다.")
                 .build();
-
     }
 }

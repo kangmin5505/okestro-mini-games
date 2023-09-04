@@ -45,10 +45,11 @@ public class UserGameStatsDto {
 
     public static UserGameStatsDto createUserGameStatsDto(List<UserGameRecord> userWinRecords,
                                                           List<UserGameRecord> userLoseRecords) {
-        //TODO: literal 에서 수정하기
         Map<String, UserGameStatDto> gameStats = new HashMap<>();
         gameStats.put(GameTitle.CARD_MATCHING.getTitle(),
                 new UserGameStatDto(GameTitle.CARD_MATCHING.getTitle(), 0, 0));
+        gameStats.put(GameTitle.GOMOKU.getTitle(),
+                new UserGameStatDto(GameTitle.GOMOKU.getTitle(), 0, 0));
         userWinRecords.stream()
                 .map(UserGameRecord::getGame)
                 .map(Game::getTitle)

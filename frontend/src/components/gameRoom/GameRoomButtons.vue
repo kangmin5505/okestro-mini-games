@@ -1,51 +1,5 @@
 <template>
   <v-container class="d-flex flex-column">
-    <!--    <v-row>-->
-    <!--      <v-col>-->
-    <!--        <v-btn-->
-    <!--          class="w-100 h-100 bg-deep-purple-accent-3 text-h6 font-weight-black"-->
-    <!--          @click="inviteToggleDialog"-->
-    <!--        >-->
-    <!--          초대하기-->
-    <!--        </v-btn>-->
-
-    <!--        <v-dialog-->
-    <!--          class="w-25 h-75 bg-secondary"-->
-    <!--          :model-value="inviteToggle"-->
-    <!--          @click:outside="inviteToggleDialog"-->
-    <!--        >-->
-    <!--          <v-card-title class="text-center text-h5 font-weight-black">-->
-    <!--            초대하기-->
-    <!--          </v-card-title>-->
-    <!--          <v-card class="bg-primary h-100">-->
-    <!--            <v-card-text class="text-center text-h5 font-weight-black">-->
-    <!--              <v-container class="px-0 d-flex flex-column justify-space-around">-->
-    <!--                <v-row v-for="index in 3" :key="index">-->
-    <!--                  <v-col>-->
-    <!--                    <v-btn class="w-100 bg-primary">1</v-btn>-->
-    <!--                  </v-col>-->
-    <!--                </v-row>-->
-    <!--              </v-container>-->
-    <!--            </v-card-text>-->
-    <!--          </v-card>-->
-    <!--          <v-container>-->
-    <!--            <v-row>-->
-    <!--              <v-col>-->
-    <!--                <v-card-actions>-->
-    <!--                  <v-btn-->
-    <!--                    class="bg-green text-h6 font-weight-black"-->
-    <!--                    block-->
-    <!--                    @click="$emit('click-yes')"-->
-    <!--                    >초대하기</v-btn-->
-    <!--                  >-->
-    <!--                </v-card-actions>-->
-    <!--              </v-col>-->
-    <!--            </v-row>-->
-    <!--          </v-container>-->
-    <!--        </v-dialog>-->
-    <!--      </v-col>-->
-    <!--    </v-row>-->
-
     <v-row class="h-50">
       <v-col>
         <game-room-ready-button />
@@ -89,14 +43,7 @@ const { gameTitle, gameRoomId } = useRoute().params as {
 };
 const router = useRouter();
 const gameRoomStore = useGameRoomStore();
-
 const exitDialog = () => (exitToggleRef.value = !exitToggleRef.value);
-
-// TODO: 초대 기능
-// const inviteToggle = ref(false);
-// const inviteToggleDialog = () => {
-//   inviteToggle.value = !inviteToggle.value;
-// };
 const exitYes = async () => {
   gameRoomStore.destroyGameRoom();
   try {

@@ -14,6 +14,7 @@ import okestro.internproject.domain.game.exception.GameException;
 import okestro.internproject.domain.game.service.CardMatchingService;
 import okestro.internproject.domain.game.service.GameService;
 import okestro.internproject.domain.game.service.GameStompService;
+import okestro.internproject.domain.game.service.GomokuService;
 import okestro.internproject.domain.user.entity.SimpleUser;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,12 +33,13 @@ public class GameController {
 
     private final GameService gameService;
     private final CardMatchingService cardMatchingService;
+    private final GomokuService gomokuService;
     private final Map<GameTitle, GameStompService> gameStompServices = new ConcurrentHashMap<>();
-
 
     @PostConstruct
     public void init() {
         gameStompServices.put(GameTitle.CARD_MATCHING, cardMatchingService);
+        gameStompServices.put(GameTitle.GOMOKU, gomokuService);
     }
 
     @GetMapping
@@ -67,13 +69,12 @@ public class GameController {
         return gameStompServices.get(gameTitle).joinGameRoom(gameTitle.getTitle(), gameRoomId, user)
                 .map(GameRoomInfoDto::createGameRoomInfoDto)
                 .orElseThrow(() -> new GameException(GameErrorCode.CAN_NOT_JOIN_GAME_ROOM));
-
     }
 
     @DeleteMapping("/{gameTitle}/{gameRoomId}")
     public void deleteGameRoom(@PathVariable GameTitle gameTitle, @PathVariable UUID gameRoomId,
                                @CookieValue(JwtProvider.TYPE_ACCESS) SimpleUser user) {
-        gameStompServices.get(gameTitle).deleteGameRoom(gameRoomId, user);
+        gameStompServices.get(gameTitle).deleteGameRoom(gameTitle, gameRoomId, user);
     }
 
     @GetMapping("/{gameTitle}/{gameRoomId}/start")

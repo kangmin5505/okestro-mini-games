@@ -23,6 +23,7 @@ public class GameService {
     @PostConstruct
     public void init() {
         gameRepository.save(new Game(GameTitle.CARD_MATCHING));
+        gameRepository.save(new Game(GameTitle.GOMOKU));
     }
 
     public List<Game> findAllGame() {
