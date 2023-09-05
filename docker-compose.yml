@@ -28,6 +28,7 @@ services:
     networks:
       - front-tier
       - back-tier
+      - prometheus-tier
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://database:${MARIADB_PORT}/${MARIADB_DATABASE}
       SPRING_DATASOURCE_USERNAME: ${MARIADB_USER}
@@ -37,7 +38,6 @@ services:
       FE_HTTP_URL: ${FE_HTTP_URL}
       JWT_SECRET: ${JWT_SECRET}
       TZ: ${TIME_ZONE}
-
 
   database:
     restart: always
@@ -54,8 +54,46 @@ services:
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
       TZ: ${TIME_ZONE}
 
+  prometheus:
+    restart: always
+    container_name: prometheus
+    image: prom/prometheus:latest
+    volumes:
+      - ./docker/prometheus/config:/etc/prometheus
+      - ./docker/prometheus/volume:/prometheus
+    command:
+      - '--web.enable-lifecycle'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on:
+      - backend
+    networks:
+      - prometheus-tier
+      - grafana-tier
+    environment:
+      TZ: ${TIME_ZONE}
+
+  grafana:
+    restart: always
+    container_name: grafana
+    image: grafana/grafana:latest
+    volumes:
+      - ./docker/grafana/volume:/var/lib/grafana
+    ports:
+      - "9090:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - grafana-tier
+    environment:
+      TZ: ${TIME_ZONE}
+
+
 networks:
   front-tier:
     name: front-tier
   back-tier:
     name: back-tier
+  prometheus-tier:
+    name: prometheus-tier
+  grafana-tier:
+    name: grafana-tier

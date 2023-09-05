@@ -26,8 +26,6 @@ spring:
             clientSecret: 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
             scope:
               - email
-#logging.level:
-#  org.hibernate.type: trace
 
 app:
   fe:
@@ -38,3 +36,22 @@ app:
 logging:
   level:
     web: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+
+actuator:
+  username: actuator
+  password: actuator
+  role: ACTUATOR

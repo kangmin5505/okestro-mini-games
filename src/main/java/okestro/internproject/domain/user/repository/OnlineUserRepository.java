@@ -34,4 +34,8 @@ public class OnlineUserRepository {
         onlineUsers.remove(userId);
     }
 
+    public long count() {
+        return onlineUsers.size();
+    }
+
 }

@@ -39,3 +39,17 @@ app:
 logging:
   level:
     web: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true

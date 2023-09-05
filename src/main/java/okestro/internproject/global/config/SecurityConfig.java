@@ -9,6 +9,7 @@ import okestro.internproject.domain.auth.oauth2.service.OAuth2UserServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,8 +28,9 @@ public class SecurityConfig {
     @Value("${app.fe.http-url}")
     private String FE_URL;
 
+    @Order(0)
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain jwtSecurity(HttpSecurity http) throws Exception {
         http
                 .httpBasic().disable()
                 .formLogin().disable()
@@ -39,6 +41,7 @@ public class SecurityConfig {
 
         http
                 .authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/oauth2/**").permitAll()
                 .anyRequest().authenticated();
 

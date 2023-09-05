@@ -1,5 +1,6 @@
 package okestro.internproject.domain.game.service;
 
+import io.micrometer.core.annotation.Counted;
 import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.dto.common.MessageDto;
 import okestro.internproject.domain.game.dto.gomoku.BoardDto;
@@ -44,6 +45,7 @@ public class GomokuService extends GameStompService {
     }
 
     @Override
+    @Counted("my.game.gomoku.start")
     public void startGame(UUID gameRoomId) {
         GameRoom gameRoom = gomokuRepository.findById(gameRoomId)
                 .orElseThrow(() -> new GameException(GameErrorCode.NOT_EXIST_GAME_ROOM));
