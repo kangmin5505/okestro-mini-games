@@ -87,6 +87,16 @@ services:
     environment:
       TZ: ${TIME_ZONE}
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - prometheus-tier
 
 networks:
   front-tier:
