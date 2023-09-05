@@ -1,5 +1,6 @@
 package okestro.internproject.domain.game.service;
 
+import io.micrometer.core.annotation.Counted;
 import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.dto.cardMatching.CardMatchDtos;
 import okestro.internproject.domain.game.dto.cardMatching.CardsDto;
@@ -46,6 +47,7 @@ public class CardMatchingService extends GameStompService {
     }
 
     @Override
+    @Counted("my.game.card-matching.start")
     public void startGame(UUID gameRoomId) {
         GameRoom gameRoom = cardMatchingRepository.findById(gameRoomId)
                 .orElseThrow(() -> new GameException(GameErrorCode.NOT_EXIST_GAME_ROOM));

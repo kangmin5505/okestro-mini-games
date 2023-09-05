@@ -45,3 +45,6 @@ frontend/.env
 frontend/.env.development
 frontend/dist/
 docker/nginx/html
+docker/grafana/volume
+docker/prometheus/config/data
+docker/prometheus/volume

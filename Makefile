@@ -15,8 +15,9 @@ up : build
 
 deploy : build
 	@scp -P 3335 ./build/libs/*.jar kangmin@100.0.0.189:/home/kangmin/OMG/build/libs
-	@scp -P 3335 .env  Dockerfile docker-compose.yml kangmin@100.0.0.189:/home/kangmin/OMG/
+	@scp -P 3335 .env Dockerfile docker-compose.yml kangmin@100.0.0.189:/home/kangmin/OMG/
 	@scp -P 3335 -r ./docker/nginx/ kangmin@100.0.0.189:/home/kangmin/OMG/docker/
+	@scp -P 3335 ./docker/prometheus/config/prometheus.yml kangmin@100.0.0.189:/home/kangmin/OMG/docker/prometheus/config/
 
 	@echo "${GREEN}Deploy Success!${NC}"
 	@echo "Do you want to login to fortivpn? (yes/no): "

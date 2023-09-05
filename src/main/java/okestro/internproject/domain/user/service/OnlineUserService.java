@@ -33,6 +33,10 @@ public class OnlineUserService {
         onlineUserRepository.save(onlineUser);
     }
 
+    public long getOnlineUserCount() {
+        return onlineUserRepository.count();
+    }
+
     public void joinGameRoom(SimpleUser user, String gameTitle, UUID gameRoomId) {
         onlineUserRepository.updateGameRoomInfo(user.getId(), gameTitle, gameRoomId);
     }
