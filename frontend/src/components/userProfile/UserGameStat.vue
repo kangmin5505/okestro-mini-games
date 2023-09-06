@@ -2,6 +2,7 @@
   <v-card
     class="d-flex h-100 w-100 text-h4 font-italic flex-column text-center"
     color="tertiary"
+    v-if="userStatRef"
   >
     <v-select
       v-model="titleRef"
@@ -23,7 +24,7 @@
       </v-list>
     </v-menu>
     <v-row class="font-weight-black text-h5">
-      <v-col></v-col>
+      <v-col />
       <v-col>유저 전적</v-col>
       <v-col>상대 전적</v-col>
     </v-row>
