@@ -32,8 +32,8 @@ public class GomokuInstance implements GameInstance {
 
     private final SimpleUser player1;
     private final SimpleUser player2;
-    private int player1Score = 1;
-    private int player2Score = 1;
+    private int player1Score = 0;
+    private int player2Score = 0;
     private final GomokuBoardState[][] board;
     private final LocalDateTime startTime;
     private LocalDateTime finishTime;
@@ -63,7 +63,6 @@ public class GomokuInstance implements GameInstance {
         if (putResult.equals(PutResult.SUCCESS)) {
             putStone(row, col, getCurrentTurnStone());
             if (isFinished(row, col)) {
-                finishGame();
                 return PutResult.FINISH;
             }
         }
