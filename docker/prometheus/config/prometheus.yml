@@ -18,6 +18,6 @@ scrape_configs:
       - targets: [ backend:8080 ]
 
   - job_name: "cadvisor"
-    scrape_interval: 5s
+    scrape_interval: 1m
     static_configs:
       - targets: [ cadvisor:8080 ]
