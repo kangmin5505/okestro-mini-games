@@ -1,40 +1,27 @@
 package okestro.internproject.domain.auth.jwt.entity;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import okestro.internproject.domain.user.entity.db.User;
-import okestro.internproject.global.entity.BaseDateTimeEntity;
+import lombok.ToString;
+import okestro.internproject.domain.auth.jwt.provider.JwtProvider;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import java.util.UUID;
 
-@Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken extends BaseDateTimeEntity {
+@ToString
+@RedisHash(value = "refreshToken", timeToLive = JwtProvider.REFRESH_TOKEN_EXPIRE_TIME)
+public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "refresh_token_id")
-    private Long id;
+    private UUID userId;
 
-    @NotBlank
-    @Column(length = 512)
-    private String token;
-
-    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    private final String token;
 
     @Builder
-    public RefreshToken(String token, User user) {
-        this.token = token;
-        this.user = user;
-    }
-
-    public void update(String token) {
+    public RefreshToken(UUID userId, String token) {
+        this.userId = userId;
         this.token = token;
     }
 }

@@ -26,6 +26,9 @@ spring:
             clientSecret: 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
             scope:
               - email
+  redis:
+    host: localhost
+    port: 6379
 
 app:
   fe:

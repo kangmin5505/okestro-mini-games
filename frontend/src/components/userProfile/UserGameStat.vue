@@ -2,7 +2,6 @@
   <v-card
     class="d-flex h-100 w-100 text-h4 font-italic flex-column text-center"
     color="tertiary"
-    v-if="userStatRef"
   >
     <v-select
       v-model="titleRef"

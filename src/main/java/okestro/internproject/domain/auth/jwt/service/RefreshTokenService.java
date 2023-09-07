@@ -8,21 +8,19 @@ import okestro.internproject.domain.user.exception.UserErrorCode;
 import okestro.internproject.domain.user.exception.UserException;
 import okestro.internproject.domain.user.service.UserService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserService userService;
 
     public Optional<RefreshToken> findByUserId(UUID userId) {
-        return refreshTokenRepository.findByUserId(userId);
+        return refreshTokenRepository.findById(userId);
     }
 
     public void save(RefreshToken refreshToken) {
@@ -33,15 +31,15 @@ public class RefreshTokenService {
         User user = userService.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.CAN_NOT_FIND_USER));
 
-        Optional<RefreshToken> refreshTokenOptional = findByUserId(userId);
-        if (refreshTokenOptional.isPresent()) {
-            refreshTokenOptional.get().update(refreshToken);
-        } else {
-            save(RefreshToken.builder()
-                    .token(refreshToken)
-                    .user(user)
-                    .build()
-            );
-        }
+        refreshTokenRepository.save(RefreshToken.builder()
+                .token(refreshToken)
+                .userId(user.getId())
+                .build()
+        );
+    }
+
+    public void deleteByUserId(UUID userId) {
+        refreshTokenRepository.findById(userId)
+                .ifPresent(refreshTokenRepository::delete);
     }
 }

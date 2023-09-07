@@ -29,6 +29,7 @@ services:
       - front-tier
       - back-tier
       - prometheus-tier
+      - redis-tier
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://database:${MARIADB_PORT}/${MARIADB_DATABASE}
       SPRING_DATASOURCE_USERNAME: ${MARIADB_USER}
@@ -37,6 +38,8 @@ services:
       OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
       FE_HTTP_URL: ${FE_HTTP_URL}
       JWT_SECRET: ${JWT_SECRET}
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT}
       TZ: ${TIME_ZONE}
 
   database:
@@ -79,7 +82,7 @@ services:
     volumes:
       - ./docker/grafana/volume:/var/lib/grafana
     ports:
-      - "9090:3000"
+      - "3000:3000"
     depends_on:
       - prometheus
     networks:
@@ -98,6 +101,15 @@ services:
     networks:
       - prometheus-tier
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - redis-tier
+    environment:
+      REDIS_PORT: ${REDIS_PORT}
+      TZ: ${TIME_ZONE}
+
 networks:
   front-tier:
     name: front-tier
@@ -107,3 +119,5 @@ networks:
     name: prometheus-tier
   grafana-tier:
     name: grafana-tier
+  redis-tier:
+    name: redis-tier

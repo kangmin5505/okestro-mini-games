@@ -34,7 +34,7 @@ public class JwtProvider {
 
 
     public final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000L;               //30분
-    public final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;     //7일
+    public static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;     //7일
     public static final String TYPE_ACCESS = "omg_.access";
     public static final String TYPE_REFRESH = "omg_.refresh";
     private final Key key;

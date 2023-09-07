@@ -29,6 +29,9 @@ spring:
             redirect-uri: ${FE_HTTP_URL}/login/oauth2/code/google
             scope:
               - email
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
 
 app:
   fe:

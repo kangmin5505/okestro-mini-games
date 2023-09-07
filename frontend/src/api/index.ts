@@ -1,9 +1,23 @@
-import { AxiosError, AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { useAxios, UseAxiosOptions } from "@vueuse/integrations/useAxios";
 import { useErrorModalStore } from "@/store/errorModal";
 import { ErrorMessage } from "@/types/stomp";
 
 const API_URL = `${import.meta.env.VITE_BACK_URL}/api/v1`;
+const axiosInstance = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response.status === 401) {
+      return axiosInstance.request(error.config);
+    }
+    return Promise.reject(error);
+  },
+);
 
 interface AxiosErrorModal {
   errorTitle?: string;
@@ -18,7 +32,6 @@ export const useCustomAxios = async (
 ) => {
   const defaultConfig: AxiosRequestConfig = {
     method: "GET",
-    baseURL: API_URL,
     withCredentials: true,
   };
   const defaultErrorModal = {
@@ -51,9 +64,8 @@ export const useCustomAxios = async (
     },
   };
 
-  return useAxios(
-    url,
-    { ...defaultConfig, ...config },
-    { ...defaultOptions, ...options },
-  );
+  return useAxios(url, { ...defaultConfig, ...config }, axiosInstance, {
+    ...defaultOptions,
+    ...options,
+  });
 };

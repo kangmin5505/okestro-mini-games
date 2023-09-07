@@ -15,6 +15,7 @@ public class CookieUtils {
     private static String FE_HTTP_URL;
     private static final Long MAX_COOKIE_AGE = 7 * 24 * 60 * 60L;
 
+
     public static void setTokenCookie(HttpServletResponse response, String token, String tokenType) {
         ResponseCookie accessCookie = createTokenCookie(token, tokenType);
         response.addHeader("Set-Cookie", accessCookie.toString());

@@ -1,7 +1,6 @@
 package okestro.internproject.domain.auth.jwt.filter;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.auth.jwt.provider.JwtProvider;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Optional;
 
-@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
@@ -26,8 +24,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         if (accessTokenOptional.isPresent() && jwtProvider.validateToken(accessTokenOptional.get())) {
             jwtProvider.setAuthentication(accessTokenOptional.get());
         } else {
-            Optional<String> refreshTokenOptional = jwtProvider.resolveToken((HttpServletRequest) request, JwtProvider.TYPE_REFRESH);
-            refreshTokenOptional
+            jwtProvider.resolveToken((HttpServletRequest) request, JwtProvider.TYPE_REFRESH)
                     .ifPresent((refreshToken) -> reissueAccessTokenIfRefreshTokenIsValid(response, refreshToken));
         }
         chain.doFilter(request, response);
