@@ -10,7 +10,7 @@ build :
 .PHONY: build
 
 up : build
-	@docker compose up --build
+	@docker compose up --build -d
 .PHONY: up
 
 deploy : build
