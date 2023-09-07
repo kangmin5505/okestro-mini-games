@@ -2,7 +2,6 @@ package okestro.internproject.domain.game.entity.memory;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.dto.cardMatching.CardMatchDto;
 import okestro.internproject.domain.game.dto.cardMatching.CardMatchDtos;
 import okestro.internproject.domain.user.entity.SimpleUser;
@@ -15,7 +14,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Slf4j
 @Getter
 public class CardMatchingInstance implements GameInstance {
 

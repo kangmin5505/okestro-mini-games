@@ -1,7 +1,6 @@
 package okestro.internproject.domain.auth.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,6 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@Slf4j
 @RequiredArgsConstructor
 public class AuthController {
 

@@ -1,7 +1,6 @@
 package okestro.internproject.domain.game.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.auth.jwt.provider.JwtProvider;
 import okestro.internproject.domain.game.dto.GameRoomCreateDto;
 import okestro.internproject.domain.game.dto.GameRoomInfoDto;
@@ -28,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @RestController
 @RequestMapping("/api/v1/games")
 @RequiredArgsConstructor
-@Slf4j
 public class GameController {
 
     private final GameService gameService;

@@ -2,7 +2,6 @@ package okestro.internproject.domain.game.entity.memory;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.enums.GomokuBoardState;
 import okestro.internproject.domain.game.enums.GomokuTurn;
 import okestro.internproject.domain.game.enums.PutResult;
@@ -11,7 +10,6 @@ import okestro.internproject.domain.user.entity.SimpleUser;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Slf4j
 @Getter
 public class GomokuInstance implements GameInstance {
 

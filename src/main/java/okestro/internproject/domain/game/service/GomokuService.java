@@ -1,7 +1,6 @@
 package okestro.internproject.domain.game.service;
 
 import io.micrometer.core.annotation.Counted;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.dto.common.MessageDto;
 import okestro.internproject.domain.game.dto.gomoku.BoardDto;
 import okestro.internproject.domain.game.entity.memory.GameRoom;
@@ -25,7 +24,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-@Slf4j
 public class GomokuService extends GameStompService {
 
     private final GomokuRepository gomokuRepository;

@@ -1,7 +1,6 @@
 package okestro.internproject.domain.game.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.entity.db.Game;
 import okestro.internproject.domain.game.enums.GameTitle;
 import okestro.internproject.domain.game.repository.GameRepository;
@@ -14,7 +13,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class GameService {
 

@@ -1,7 +1,6 @@
 package okestro.internproject.domain.ranking.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.enums.GameTitle;
 import okestro.internproject.domain.ranking.dto.RankingPageDto;
 import okestro.internproject.domain.ranking.service.RankingService;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/rankings")
 @RequiredArgsConstructor
-@Slf4j
 public class RankingController {
 
     private final RankingService rankingService;

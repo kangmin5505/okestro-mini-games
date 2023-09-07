@@ -1,7 +1,6 @@
 package okestro.internproject.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.user.dto.UserGameRecordDto;
 import okestro.internproject.domain.user.dto.UserGameRecordPageDto;
 import okestro.internproject.domain.user.dto.UserGameStatsDto;
@@ -22,7 +21,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class UserGameRecordService {

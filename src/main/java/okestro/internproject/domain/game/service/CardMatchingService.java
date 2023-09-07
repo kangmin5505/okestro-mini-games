@@ -1,7 +1,6 @@
 package okestro.internproject.domain.game.service;
 
 import io.micrometer.core.annotation.Counted;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.dto.cardMatching.CardMatchDtos;
 import okestro.internproject.domain.game.dto.cardMatching.CardsDto;
 import okestro.internproject.domain.game.dto.common.MessageDto;
@@ -27,11 +26,9 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-@Slf4j
 public class CardMatchingService extends GameStompService {
 
     private final CardMatchingRepository cardMatchingRepository;
-
 
     @Autowired
     public CardMatchingService(CardMatchingRepository cardMatchingRepository,

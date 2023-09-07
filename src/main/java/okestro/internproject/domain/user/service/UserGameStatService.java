@@ -1,7 +1,6 @@
 package okestro.internproject.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.enums.GameTitle;
 import okestro.internproject.domain.game.service.GameService;
 import okestro.internproject.domain.user.entity.db.User;
@@ -20,7 +19,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class UserGameStatService {

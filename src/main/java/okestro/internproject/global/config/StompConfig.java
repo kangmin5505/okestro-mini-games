@@ -1,6 +1,5 @@
 package okestro.internproject.global.config;
 
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.auth.oauth2.principal.PrincipalDetails;
 import okestro.internproject.domain.game.enums.GameTitle;
 import okestro.internproject.domain.game.service.CardMatchingService;
@@ -31,7 +30,6 @@ import java.util.UUID;
 
 @Configuration
 @EnableWebSocketMessageBroker
-@Slf4j
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
 
     private final OnlineUserService onlineUserService;

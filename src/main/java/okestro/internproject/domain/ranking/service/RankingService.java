@@ -1,7 +1,6 @@
 package okestro.internproject.domain.ranking.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.enums.GameTitle;
 import okestro.internproject.domain.ranking.dto.RankingDto;
 import okestro.internproject.domain.ranking.dto.RankingPageDto;
@@ -15,7 +14,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class RankingService {
 
     private final UserGameStatService userGameStatService;

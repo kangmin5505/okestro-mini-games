@@ -1,7 +1,6 @@
 package okestro.internproject.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.user.entity.SimpleUser;
 import okestro.internproject.domain.user.entity.memory.OnlineUser;
 import okestro.internproject.domain.user.exception.UserErrorCode;
@@ -14,7 +13,6 @@ import java.util.UUID;
 
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class OnlineUserService {
 

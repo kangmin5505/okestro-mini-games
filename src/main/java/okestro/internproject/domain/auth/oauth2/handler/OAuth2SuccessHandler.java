@@ -1,7 +1,6 @@
 package okestro.internproject.domain.auth.oauth2.handler;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.auth.jwt.dto.JwtDto;
 import okestro.internproject.domain.auth.jwt.provider.JwtProvider;
 import okestro.internproject.domain.auth.jwt.service.RefreshTokenService;
@@ -20,7 +19,6 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;

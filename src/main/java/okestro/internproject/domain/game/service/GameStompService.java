@@ -1,7 +1,6 @@
 package okestro.internproject.domain.game.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.game.dto.GameRoomCreateDto;
 import okestro.internproject.domain.game.dto.common.MessageDto;
 import okestro.internproject.domain.game.entity.db.Game;
@@ -29,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @RequiredArgsConstructor
-@Slf4j
 public abstract class GameStompService {
 
     private final StompRepository stompRepository;

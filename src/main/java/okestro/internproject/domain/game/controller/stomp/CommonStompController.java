@@ -1,7 +1,6 @@
 package okestro.internproject.domain.game.controller.stomp;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.auth.jwt.dto.JwtUserDto;
 import okestro.internproject.domain.game.dto.common.ChatDto;
 import okestro.internproject.domain.game.dto.common.ReadyToggleDto;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import java.util.UUID;
 
 @Controller
-@Slf4j
 @RequiredArgsConstructor
 public class CommonStompController {
 

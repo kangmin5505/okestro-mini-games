@@ -7,7 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 import okestro.internproject.domain.auth.jwt.dto.JwtDto;
 import okestro.internproject.domain.auth.jwt.dto.JwtUserDto;
 import okestro.internproject.domain.auth.jwt.service.RefreshTokenService;
@@ -28,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.Key;
 import java.util.*;
 
-@Slf4j
 @Component
 public class JwtProvider {
 
