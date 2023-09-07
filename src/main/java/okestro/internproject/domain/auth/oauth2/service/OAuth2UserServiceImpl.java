@@ -33,7 +33,6 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         User user = userService.findByEmail(oAuth2UserInfo.getEmail())
                 .orElseGet(() -> {
                     User newUser = User.builder()
-                            .avatarURL("")  // TODO: 이미지 URL 말고 다른 방법 찾아보기
                             .email(oAuth2UserInfo.getEmail())
                             .nickname(oAuth2UserInfo.getName())
                             .oAuth2Provider(oAuth2UserInfo.getProvider())

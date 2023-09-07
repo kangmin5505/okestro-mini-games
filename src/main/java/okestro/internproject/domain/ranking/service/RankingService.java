@@ -32,12 +32,16 @@ public class RankingService {
                     .wins(userGameStat.getWins())
                     .loses(userGameStat.getLoses())
                     .totalGames(userGameStat.getTotalGames())
-                    .winPercentage(userGameStat.getWinPercentage())
+                    .winPercentage(getWinPercentage(userGameStat.getWins(), userGameStat.getTotalGames()))
                     .build());
         }
         return RankingPageDto.builder()
                 .totalElements(totalElements)
                 .rankings(rankings)
                 .build();
+    }
+
+    private Integer getWinPercentage(Integer wins, Integer totalGames) {
+        return totalGames == 0 ? 0 : (int) ((double) wins / totalGames * 100);
     }
 }

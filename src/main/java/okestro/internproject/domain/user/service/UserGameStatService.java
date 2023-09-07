@@ -54,7 +54,6 @@ public class UserGameStatService {
                                         .wins(0)
                                         .loses(0)
                                         .totalGames(0)
-                                        .winPercentage(0)
                                         .build()
                         )
                 );

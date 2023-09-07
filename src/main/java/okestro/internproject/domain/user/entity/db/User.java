@@ -32,9 +32,6 @@ public class User extends BaseDateTimeEntity implements SimpleUser {
     private String nickname;
 
     @Column(nullable = false)
-    private String avatarURL;
-
-    @Column(nullable = false)
     @Enumerated(STRING)
     private OAuth2Provider oAuth2Provider;
 
@@ -43,10 +40,9 @@ public class User extends BaseDateTimeEntity implements SimpleUser {
     private Role role;
 
     @Builder
-    public User(String email, String nickname, String avatarURL, OAuth2Provider oAuth2Provider, Role role) {
+    public User(String email, String nickname, OAuth2Provider oAuth2Provider, Role role) {
         this.email = email;
         this.nickname = nickname;
-        this.avatarURL = avatarURL;
         this.oAuth2Provider = oAuth2Provider;
         this.role = role;
     }
