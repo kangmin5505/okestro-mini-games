@@ -2,7 +2,6 @@ package okestro.internproject.domain.user.entity.db;
 
 import lombok.*;
 import okestro.internproject.domain.auth.oauth2.enums.OAuth2Provider;
-import okestro.internproject.domain.auth.oauth2.enums.Role;
 import okestro.internproject.domain.user.entity.SimpleUser;
 import okestro.internproject.global.entity.BaseDateTimeEntity;
 import org.hibernate.annotations.GenericGenerator;
@@ -35,15 +34,10 @@ public class User extends BaseDateTimeEntity implements SimpleUser {
     @Enumerated(STRING)
     private OAuth2Provider oAuth2Provider;
 
-    @Column(nullable = false)
-    @Enumerated(STRING)
-    private Role role;
-
     @Builder
-    public User(String email, String nickname, OAuth2Provider oAuth2Provider, Role role) {
+    public User(String email, String nickname, OAuth2Provider oAuth2Provider) {
         this.email = email;
         this.nickname = nickname;
         this.oAuth2Provider = oAuth2Provider;
-        this.role = role;
     }
 }

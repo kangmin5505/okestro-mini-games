@@ -1,7 +1,6 @@
 package okestro.internproject.domain.auth.oauth2.service;
 
 import lombok.RequiredArgsConstructor;
-import okestro.internproject.domain.auth.oauth2.enums.Role;
 import okestro.internproject.domain.auth.oauth2.principal.PrincipalDetails;
 import okestro.internproject.domain.auth.oauth2.provider.GoogleUserInfo;
 import okestro.internproject.domain.auth.oauth2.provider.OAuth2UserInfo;
@@ -36,7 +35,6 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
                             .email(oAuth2UserInfo.getEmail())
                             .nickname(oAuth2UserInfo.getName())
                             .oAuth2Provider(oAuth2UserInfo.getProvider())
-                            .role(Role.USER)
                             .build();
                     userService.save(newUser);
                     userGameRecordService.create(newUser);
