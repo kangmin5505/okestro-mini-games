@@ -53,7 +53,6 @@ public class UserGameStatService {
                                         .game(game.get())
                                         .wins(0)
                                         .loses(0)
-                                        .totalGames(0)
                                         .build()
                         )
                 );

@@ -36,29 +36,19 @@ public class UserGameStat extends BaseDateTimeEntity {
     @Column(nullable = false)
     private Integer loses;
 
-    @Column(nullable = false)
-    private Integer totalGames;
-
     public void updateWins() {
         this.wins++;
-        update();
     }
 
     public void updateLoses() {
         this.loses++;
-        update();
-    }
-
-    private void update() {
-        this.totalGames++;
     }
 
     @Builder
-    public UserGameStat(User user, Game game, Integer wins, Integer loses, Integer totalGames) {
+    public UserGameStat(User user, Game game, Integer wins, Integer loses) {
         this.user = user;
         this.game = game;
         this.wins = wins;
         this.loses = loses;
-        this.totalGames = totalGames;
     }
 }
