@@ -25,14 +25,16 @@ public class RankingService {
         List<RankingDto> rankings = new ArrayList<>();
         int rank = page * limit + 1;
         for (UserGameStat userGameStat : rankingPage) {
+            Integer totalGames = userGameStat.getWins() + userGameStat.getLoses();
+
             rankings.add(RankingDto.builder()
                     .userId(userGameStat.getUser().getId())
                     .nickname(userGameStat.getUser().getNickname())
                     .rank(rank++)
                     .wins(userGameStat.getWins())
                     .loses(userGameStat.getLoses())
-                    .totalGames(userGameStat.getTotalGames())
-                    .winPercentage(getWinPercentage(userGameStat.getWins(), userGameStat.getTotalGames()))
+                    .totalGames(totalGames)
+                    .winPercentage(getWinPercentage(userGameStat.getWins(), totalGames))
                     .build());
         }
         return RankingPageDto.builder()

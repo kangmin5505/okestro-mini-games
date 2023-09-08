@@ -57,12 +57,10 @@ public class GomokuInstance implements GameInstance {
     }
 
     public PutResult putStone(int row, int col) {
-        PutResult putResult = isCanPutStone(row, col);
+        PutResult putResult = getPutStoneResult(row, col);
         if (putResult.equals(PutResult.SUCCESS)) {
             putStone(row, col, getCurrentTurnStone());
-            if (isFinished(row, col)) {
-                return PutResult.FINISH;
-            }
+            return isFinished(row, col) ? PutResult.FINISH : PutResult.SUCCESS;
         }
         return putResult;
     }
@@ -107,7 +105,7 @@ public class GomokuInstance implements GameInstance {
         player2Score = userId.equals(player2.getId()) ? -1 : player2Score;
     }
 
-    public PutResult isCanPutStone(int row, int col) {
+    public PutResult getPutStoneResult(int row, int col) {
         if (!(isInRange(row, col) && board[row][col] == GomokuBoardState.EMPTY)) {
             return PutResult.FAIL;
         }
