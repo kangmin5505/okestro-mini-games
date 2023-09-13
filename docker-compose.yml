@@ -25,6 +25,7 @@ services:
     build: .
     depends_on:
       - database
+      - redis
     networks:
       - front-tier
       - back-tier
@@ -69,6 +70,7 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     depends_on:
       - backend
+      - cadvisor
     networks:
       - prometheus-tier
       - grafana-tier
@@ -91,6 +93,7 @@ services:
       TZ: ${TIME_ZONE}
 
   cadvisor:
+    restart: always
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
     volumes:
@@ -102,6 +105,7 @@ services:
       - prometheus-tier
 
   redis:
+    restart: always
     image: redis:latest
     container_name: redis
     networks:
