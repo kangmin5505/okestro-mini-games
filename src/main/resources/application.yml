@@ -22,8 +22,8 @@ spring:
       client:
         registration:
           google:
-            clientId: 174995034455-sucbbvuumogg53qfkb4u00sp0ciacjoi.apps.googleusercontent.com
-            clientSecret: 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
+            clientId: ${OAUTH_CLIENT_ID}
+            clientSecret: ${OAUTH_CLIENT_SECRET}
             scope:
               - email
   redis:
@@ -34,7 +34,7 @@ app:
   fe:
     http-url: "http://localhost:3000"
   jwt:
-    secret: AIeZ6sEwZU7ijGoKMd/HfKFfPL59ASoX0w6llEGlH8M=
+    secret: ${JWT_SECRET}
 
 logging:
   level:
@@ -53,8 +53,3 @@ server:
   tomcat:
     mbeanregistry:
       enabled: true
-
-actuator:
-  username: actuator
-  password: actuator
-  role: ACTUATOR
