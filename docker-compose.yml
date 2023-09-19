@@ -4,13 +4,9 @@ services:
   frontend:
     restart: always
     container_name: frontend
-    image: nginx:latest
+    image: ${DOCKERHUB_REPOSITORY}/okestro-mini-games-frontend:latest
     depends_on:
       - backend
-    volumes:
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      - ./docker/nginx/html:/usr/share/nginx/html
-      - ./docker/nginx/images:/usr/share/nginx/images
     ports:
       - "80:80"
     networks:
@@ -21,7 +17,7 @@ services:
   backend:
     restart: always
     container_name: backend
-    image: kangmin5505/okestro-mini-games
+    image: ${DOCKERHUB_REPOSITORY}/okestro-mini-games-backend:latest
     depends_on:
       - database
       - redis
@@ -60,13 +56,9 @@ services:
   prometheus:
     restart: always
     container_name: prometheus
-    image: prom/prometheus:latest
+    image: ${DOCKERHUB_REPOSITORY}/okestro-mini-games-prometheus:latest
     volumes:
-      - ./docker/prometheus/config:/etc/prometheus
       - ./docker/prometheus/volume:/prometheus
-    command:
-      - '--web.enable-lifecycle'
-      - '--config.file=/etc/prometheus/prometheus.yml'
     depends_on:
       - backend
       - cadvisor
