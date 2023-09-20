@@ -59,8 +59,6 @@ services:
     image: ${DOCKERHUB_REPOSITORY}/okestro-mini-games-prometheus:latest
     volumes:
       - ./docker/prometheus/volume:/prometheus
-    command:
-      - "--web.enable-lifecycle"
     depends_on:
       - backend
       - cadvisor
