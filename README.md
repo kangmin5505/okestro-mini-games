@@ -3,7 +3,7 @@
 - [설계 발표 프레젠테이션](https://docs.google.com/presentation/d/e/2PACX-1vRjXZxk3c3LyUPs-pwh-Du2A9wZkDSzNl1he0aeW-tgldQ_OlX8oyrqlzsOfiJeXheMS5OiAbEhhzYf/pub?start=false&loop=false&delayms=3000)
 - [구현 발표 프레젠테이션](https://docs.google.com/presentation/d/e/2PACX-1vTXlOI9KzXv7wUmkb_p7GfwPq9QyeWqoxNU54lM2dbNjzd2H8SzU8ggw9WnyE5ovSOVzkXGzTf-UAGc/pub?start=false&loop=false&delayms=3000)
 - [최종 발표 프레젠테이션](https://docs.google.com/presentation/d/e/2PACX-1vSP8V10OfoavAztGysJH7qBpwOu2tCeHto4oJ9LBU8kcK3LJUgM_wk4UBkyHi0MA-lcSPBiHpEztJLw/pub?start=false&loop=false&delayms=3000)
-- 최종 발표 영상(추가 예정)
+- [최종 발표 영상](https://youtu.be/U5AAMarTp0o)
 
 
 ## 프로젝트 주제 및 선정 이유
